@@ -1,81 +1,111 @@
-# FDSmart - Intelligent Food & Drink Ordering Application
+# FDSmart - Intelligent Food & Drink Ordering Application 🚀
 
-## Overview
-FDSmart is a Flutter-based cross-platform mobile application designed to provide a smart, queue-free canteen ordering token tracking experience. It connects Students/Staff with Canteen Administrators for seamless food ordering.
+## ✨ Overview
+**FDSmart** is a premium, high-performance Flutter application designed to revolutionize the campus dining experience. It provides a seamless, queue-free ordering system with real-time token tracking, making healthy eating easier and smarter than ever before.
 
-## Features
+---
 
-### User (Student/Staff)
-- **Authentication**: secure Login & Registration (Firebase Auth).
-- **Home Dashboard**: View specials, navigating to Menu, Orders, Profile.
-- **Menu Browsing**: Filtered view for Food and Drinks with details.
-- **Order Placement**: Add to cart, review tokens, and confirm order.
-- **Real-time Tracking**: View order status (Preparing -> Ready -> Completed).
-- **Offline Mode**: View cached menu data when offline (Connectivity Plus + Hive/Cache).
+## 🌟 Key Features
 
-### Admin (Canteen Staff)
-- **Admin Dashboard**: Switch between Orders and Menu management.
-- **Order Management**: View active orders, update status (Preparing/Ready/Completed) in real-time.
-- **Menu Management**: Add, Edit, Delete, and Toggle availability of items.
+### 👤 For Students & Staff
+- **🔐 Intelligent Authentication**: Secure login and registration with Firebase. Includes a **Demo Mode** fallback for instant testing.
+- **🏠 Dynamic Dashboard**: 
+    - **Personalized Greetings**: Warm welcomes based on the time of day and user name.
+    - **Interactive "Today's Specials"**: View daily deals with direct "Add to Cart" functionality.
+- **🥗 Healthy Picks**: Intelligent filtering system to help users find the most nutritious meals effortlessly.
+- **🌐 Multi-Language Support**: Fully localized in **English**, **Sinhala**, and **Tamil**.
+- **📊 Nutrition Tracker**: Integrated nutrition information and tracking simulation.
+- **🛒 Smart Cart & Checkout**: Interactive cart management with instant token generation upon order success.
+- **🕒 Real-time Order Tracker**: Follow your order from "Preparing" to "Ready" in real-time.
+- **📸 Profile Management**: Update profile details and upload profile photos locally.
+- **📶 Offline-Ready UI**: Visual indicators for network status ensuring users always know when they are connected.
 
-## Architecture
-The application follows the **MVVM (Model-View-ViewModel)** architectural pattern.
+### 🛠 For Canteen Admins
+- **📊 Centralized Management**: Complete control over orders and the menu through a dedicated admin portal.
+- **📦 Order Fulfillment**: Real-time order queue management to update statuses instantly.
+- **🍏 Menu Control**: Dynamic menu updates (Add/Edit/Delete) with a toggle for item availability.
 
-- **Model**: Data structures (`user_model.dart`, `menu_item_model.dart`, `order_model.dart`).
-- **View**: UI Screens (`LoginScreen`, `HomeScreen`, `MenuScreen`, etc.).
-- **ViewModel**: Business Logic & State Management (`AuthViewModel`, `MenuViewModel`, `OrderViewModel`).
-- **Services**: Firebase (Firestore, Auth), Connectivity.
+---
 
-### State Management
-- **Provider**: Used for dependency injection and state management across ViewModels.
+## 🎨 Design Aesthetics
+- **Modern UI**: Dark-themed architecture with an elegant **Off-White** header for accessibility.
+- **Rich Interaction**: Smooth micro-animations, glassmorphism overlays, and haptic feedback.
+- **Brand Identity**: Consistent color palette (Deep Orange & Amber) reflecting energy and food health.
 
-## Technology Stack
-- **Framework**: Flutter (Dart)
-- **Backend**: Firebase (Auth, Firestore)
-- **Local Storage**: Hive (Planned integration for deep caching), Connectivity Plus
-- **Styling**: Custom Theme (Dark Mode, Outfit Font)
+---
 
-## Setup Instructions
+## 🏗 Architecture & Tech Stack
+The application follows the **MVVM (Model-View-ViewModel)** architectural pattern for clean separation of concerns and scalability.
 
-1.  **Prerequisites**: Flutter SDK, Dart, Android Studio / VS Code.
-2.  **Firebase Setup**:
-    -   Create a Firebase Project.
-    -   Enable Authentication (Email/Password).
-    -   Enable Cloud Firestore.
-    -   Run `flutterfire configure` to generate `firebase_options.dart`.
-    -   Currently, a dummy `firebase_options.dart` is provided. **You MUST replace it.**
-3.  **Run Application**:
-    ```bash
-    flutter pub get
-    flutter run
-    ```
-4.  **Build APK**:
-    ```bash
-    flutter build apk
-    ```
+- **Framework**: [Flutter](https://flutter.dev/) (Dart)
+- **Backend**: [Firebase](https://firebase.google.com/) (Auth, Cloud Firestore)
+- **State Management**: [Provider](https://pub.dev/packages/provider)
+- **Local Storage**: [Hive](https://pub.dev/packages/hive) & [SharedPreferences]
+- **Media**: [Image Picker](https://pub.dev/packages/image_picker) for profile photos.
+- **Utility**: `connectivity_plus`, `google_fonts`.
 
-## Folder Structure
+---
+
+## 🚀 Setup & Installation
+
+### Prerequisites
+- Flutter SDK (Latest Stable)
+- Dart SDK
+- Android Studio / VS Code
+
+### 1. Clone & Install
+```bash
+git clone https://github.com/salharifan/FDSmart.git
+cd FDSmart
+flutter pub get
+```
+
+### 2. Firebase Configuration
+To use live backend features:
+1. Create a Firebase Project on the [Firebase Console](https://console.firebase.google.com/).
+2. Enable **Email/Password Authentication** and **Cloud Firestore**.
+3. Generate your `firebase_options.dart` using the FlutterFire CLI:
+   ```bash
+   flutterfire configure
+   ```
+
+### 3. Run Application
+```bash
+flutter run
+```
+
+---
+
+## 📂 Project Structure
 ```
 lib/
 ├── core/
-│   ├── constants/
-│   ├── theme/          # AppTheme, AppColors
-│   ├── widgets/        # Reusable widgets (Buttons, TextFields, OfflineBanner)
+│   ├── theme/          # Custom AppTheme, AppColors
+│   ├── widgets/        # Universal UI Components (Buttons, Header, Banner)
 ├── features/
-│   ├── admin/          # Admin Dashboard & Logic
-│   ├── auth/           # Login/Register Screens & Logic
-│   ├── home/           # Dashboard Screen & Widgets
-│   ├── menu/           # Menu Listing, Details, ViewModel
-│   ├── orders/         # Order History, Placement, ViewModel
-├── main.dart           # Entry point & Providers
-└── firebase_options.dart # Firebase Config (Needs Update)
+│   ├── admin/          # Admin Dashboard & Fulfillment logic
+│   ├── auth/           # Auth logic, Profile, & Multi-language support
+│   ├── home/           # Main Dashboard & Interactive Widgets
+│   ├── menu/           # Menu Browsing & Detailed Item Views
+│   ├── orders/         # Cart, History, & Nutrition Tracking
+├── main.dart           # Service locator & Application Entry
 ```
 
-## Testing
-- Unit & Widget tests are located in `test/`.
-- Run `flutter test` to execute.
+---
 
-## Future Enhancements
-- Deep Hive integration for full offline cart persistence.
-- Push Notifications (FCM) for order status updates.
-- Payment Gateway integration.
+## 🛠 Testing
+Validate the application with the built-in test suite:
+```bash
+flutter test
+```
+
+---
+
+## 🔮 Future Roadmap
+- [ ] Integration with a live Payment Gateway (Stripe/Payhere).
+- [ ] Push Notifications (FCM) for "Order Ready" alerts.
+- [ ] Machine Learning based personal dietary recommendations.
+- [ ] Real-time canteen occupancy tracker.
+
+---
+**Developed with ❤️ by the FDSmart Team**
