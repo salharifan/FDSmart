@@ -159,32 +159,6 @@ class MenuViewModel extends ChangeNotifier {
         tag: 'healthy',
       ),
       MenuItemModel(
-        id: '1-1',
-        name: 'MIXED FRUIT SALAD',
-        description:
-            'Seasonal fresh healthy fruits mixed with a touch of honey and mint. Refreshing healthy pick.',
-        price: 350.0,
-        imageUrl:
-            'local:fruit_salad_generated.png', // I'll use the generated high qual ones as well or fallback
-        category: 'food',
-        rating: 4.7,
-        calories: 150,
-        tag: 'healthy',
-        isSpecial: true,
-      ),
-      MenuItemModel(
-        id: '1-2',
-        name: 'QUINOA VEGGIE BOWL',
-        description:
-            'Nutrient dense quinoa with roasted vegetables and lemon tahini dressing.',
-        price: 550.0,
-        imageUrl: 'local:protein milkshakes.jpg', // Placeholder
-        category: 'food',
-        rating: 4.9,
-        calories: 210,
-        tag: 'healthy',
-      ),
-      MenuItemModel(
         id: '2',
         name: 'GREEK SALMON BOWL',
         description:
@@ -270,7 +244,7 @@ class MenuViewModel extends ChangeNotifier {
         name: 'STRAWBERRY MOJITO',
         description:
             'Refreshing blend of fresh strawberries, mint, lime, and soda.',
-        price: 350.0,
+        price: 380.0,
         imageUrl: 'local:Strawberry Mojito.jpg',
         category: 'drink',
         rating: 4.8,
@@ -289,7 +263,7 @@ class MenuViewModel extends ChangeNotifier {
         tag: 'healthy',
       ),
       MenuItemModel(
-        id: '10-1',
+        id: '11',
         name: 'KOLA KANDA (HEALTHY)',
         description:
             'Traditional herbal gruel made with medicinal healthy greens and rice. Ultimate healthy drink.',
@@ -301,7 +275,7 @@ class MenuViewModel extends ChangeNotifier {
         tag: 'healthy',
       ),
       MenuItemModel(
-        id: '10-2',
+        id: '12',
         name: 'PROTEIN MILKSHAKE',
         description:
             'Whey protein blended with milk and banana. Perfect healthy recovery.',
@@ -314,7 +288,7 @@ class MenuViewModel extends ChangeNotifier {
         isSpecial: true,
       ),
       MenuItemModel(
-        id: '11',
+        id: '13',
         name: 'MASALA CHAI',
         description:
             'Indian style black tea brewed with aromatic spices and milk.',
@@ -325,7 +299,7 @@ class MenuViewModel extends ChangeNotifier {
         calories: 90,
       ),
       MenuItemModel(
-        id: '12',
+        id: '14',
         name: 'LEMON MOJITO COCKTAIL',
         description: 'Sparkling cocktail with zesty lemon and cool mint.',
         price: 450.0,
@@ -336,76 +310,13 @@ class MenuViewModel extends ChangeNotifier {
       ),
       MenuItemModel(
         id: '15',
-        name: 'OATMEAL FRUIT BOWL',
-        description:
-            'Warm healthy oats topped with fresh fruits, nuts and honey.',
-        price: 380.0,
-        imageUrl: 'local:fruit_salad_generated.png',
-        category: 'food',
-        rating: 4.8,
-        calories: 310,
-        tag: 'healthy',
-        isSpecial: true,
-      ),
-      MenuItemModel(
-        id: '16',
-        name: 'GREEN SMOOTHIE',
-        description:
-            'Nutrient-packed healthy smoothie with spinach, apple, and ginger.',
-        price: 420.0,
-        imageUrl: 'local:avacado juice.png',
+        name: 'CHILLED PEPSI',
+        description: 'Refresh yourself with a classic chilled Pepsi Classic.',
+        price: 120.0,
+        imageUrl: 'local:pepsi.png',
         category: 'drink',
-        rating: 4.9,
+        rating: 4.3,
         calories: 140,
-        tag: 'healthy',
-      ),
-      MenuItemModel(
-        id: '17',
-        name: 'GRILLED CHICKEN SALAD',
-        description: 'Tender grilled chicken on a bed of fresh healthy greens.',
-        price: 750.0,
-        imageUrl: 'local:Green salad.jpg',
-        category: 'food',
-        rating: 4.8,
-        calories: 380,
-        tag: 'healthy',
-        isSpecial: true,
-      ),
-      MenuItemModel(
-        id: '18',
-        name: 'CHICKPEA SALAD BOWL',
-        description:
-            'Protein-rich chickpeas with cucumber, onions and healthy lemon juice.',
-        price: 320.0,
-        imageUrl: 'local:Green salad.jpg',
-        category: 'food',
-        rating: 4.7,
-        calories: 280,
-        tag: 'healthy',
-      ),
-      MenuItemModel(
-        id: '19',
-        name: 'BERRY POWER SMOOTHIE',
-        description: 'Antioxidant rich healthy mixed berries with almond milk.',
-        price: 450.0,
-        imageUrl: 'local:Strawberry Mojito.jpg',
-        category: 'drink',
-        rating: 4.9,
-        calories: 180,
-        tag: 'healthy',
-        isSpecial: true,
-      ),
-      MenuItemModel(
-        id: '20',
-        name: 'TOFU STIR FRY',
-        description:
-            'Pan-fried tofu with healthy seasonal vegetables and light soy.',
-        price: 580.0,
-        imageUrl: 'local:Green salad.jpg',
-        category: 'food',
-        rating: 4.6,
-        calories: 290,
-        tag: 'healthy',
       ),
     ];
   }
