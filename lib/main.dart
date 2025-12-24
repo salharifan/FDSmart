@@ -1,3 +1,4 @@
+import 'package:fdsmart/features/auth/viewmodels/language_view_model.dart';
 import 'package:fdsmart/core/theme/app_theme.dart';
 import 'package:fdsmart/features/auth/views/login_screen.dart';
 import 'package:fdsmart/features/admin/views/admin_dashboard_screen.dart';
@@ -42,12 +43,13 @@ class FDSmartApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => AuthViewModel()),
         ChangeNotifierProvider(create: (_) => MenuViewModel()),
         ChangeNotifierProvider(create: (_) => OrderViewModel()),
+        ChangeNotifierProvider(create: (_) => LanguageViewModel()),
       ],
       child: MaterialApp(
         title: 'FDSmart',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.darkTheme,
-        initialRoute: '/login',
+        home: const AuthWrapper(),
         routes: {
           '/login': (context) => const LoginScreen(),
           '/register': (context) => const RegisterScreen(),
@@ -56,5 +58,27 @@ class FDSmartApp extends StatelessWidget {
         },
       ),
     );
+  }
+}
+
+class AuthWrapper extends StatelessWidget {
+  const AuthWrapper({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final authViewModel = Provider.of<AuthViewModel>(context);
+
+    if (authViewModel.isLoading) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
+    if (authViewModel.currentUser != null) {
+      if (authViewModel.currentUser?.role == 'admin') {
+        return const AdminDashboardScreen();
+      }
+      return const HomeScreen();
+    }
+
+    return const LoginScreen();
   }
 }

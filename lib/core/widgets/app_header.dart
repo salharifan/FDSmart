@@ -10,41 +10,56 @@ class AppHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: const BoxDecoration(color: AppColors.surfaceLight),
       child: Row(
         children: [
-          if (showBack)
+          if (showBack || Navigator.canPop(context))
             Padding(
-              padding: const EdgeInsets.only(right: 12.0),
+              padding: const EdgeInsets.only(right: 8.0),
               child: IconButton(
                 icon: const Icon(
-                  Icons.arrow_back_ios,
+                  Icons.arrow_back_ios_new_rounded,
                   color: AppColors.textPrimary,
+                  size: 20,
                 ),
                 onPressed: onBack ?? () => Navigator.pop(context),
               ),
             ),
           Container(
-            height: 40,
-            width: 40,
+            height: 48,
+            width: 48,
             decoration: BoxDecoration(
-              // color: AppColors.primary.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(10),
               image: const DecorationImage(
-                image: AssetImage('assets/images/logo.jpg'),
+                image: AssetImage('assets/images/logo.png'),
                 fit: BoxFit.cover,
               ),
             ),
           ),
-          const SizedBox(width: 12),
-          const Text(
-            'FDSmart',
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
-              letterSpacing: 0.5,
-            ),
+          const SizedBox(width: 16),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'FDSmart',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+              Text(
+                'Healthier Choices, Smarter Orders',
+                style: TextStyle(
+                  fontSize: 11,
+                  fontStyle: FontStyle.italic,
+                  color: AppColors.textPrimary.withOpacity(0.9),
+                ),
+              ),
+            ],
           ),
         ],
       ),

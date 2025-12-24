@@ -2,9 +2,13 @@ import 'package:fdsmart/core/theme/app_colors.dart';
 import 'package:fdsmart/features/auth/viewmodels/auth_view_model.dart';
 import 'package:fdsmart/features/orders/models/order_model.dart';
 import 'package:fdsmart/features/orders/viewmodels/order_view_model.dart';
+import 'package:fdsmart/features/orders/views/add_review_screen.dart';
+import 'package:fdsmart/core/widgets/custom_button.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+
+import 'package:fdsmart/core/widgets/app_header.dart';
 
 class OrderHistoryScreen extends StatelessWidget {
   const OrderHistoryScreen({super.key});
@@ -14,44 +18,96 @@ class OrderHistoryScreen extends StatelessWidget {
     final userId = Provider.of<AuthViewModel>(context).currentUser?.uid;
     final orderViewModel = Provider.of<OrderViewModel>(context, listen: false);
 
-    if (userId == null) {
-      return const Center(child: Text("Please login to view orders"));
-    }
-
     return Scaffold(
-      appBar: AppBar(title: const Text("My Orders")),
-      body: StreamBuilder<List<OrderModel>>(
-        stream: orderViewModel.getMyOrdersStream(userId),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
+      body: SafeArea(
+        child: Column(
+          children: [
+            const AppHeader(),
+            const Padding(
+              padding: EdgeInsets.all(16.0),
+              child: Text(
+                "My Orders",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+            ),
+            Expanded(
+              child: userId == null
+                  ? const Center(child: Text("Please login to view orders"))
+                  : StreamBuilder<List<OrderModel>>(
+                      stream: orderViewModel.getMyOrdersStream(userId),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        }
 
-          if (snapshot.hasError) {
-            return const Center(child: Text("Error loading orders"));
-          }
+                        if (snapshot.hasError) {
+                          return const Center(
+                            child: Text("Error loading orders"),
+                          );
+                        }
 
-          final orders = snapshot.data ?? [];
+                        final orders = snapshot.data ?? [];
 
-          if (orders.isEmpty) {
-            return const Center(child: Text("No past orders"));
-          }
+                        if (orders.isEmpty) {
+                          return Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(
+                                  Icons.receipt_long_outlined,
+                                  size: 64,
+                                  color: AppColors.textSecondary,
+                                ),
+                                const SizedBox(height: 16),
+                                const Text(
+                                  "No past orders yet",
+                                  style: TextStyle(
+                                    color: AppColors.textSecondary,
+                                  ),
+                                ),
+                                const SizedBox(height: 24),
+                                SizedBox(
+                                  width: 200,
+                                  child: CustomButton(
+                                    text: "ORDER NOW",
+                                    onPressed: () {
+                                      // Ideally switch to menu tab.
+                                      // This might be tricky from here, but we can pop or navigate.
+                                      Navigator.pushReplacementNamed(
+                                        context,
+                                        '/home',
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }
 
-          return ListView.separated(
-            padding: const EdgeInsets.all(16),
-            itemCount: orders.length,
-            separatorBuilder: (c, i) => const SizedBox(height: 16),
-            itemBuilder: (context, index) {
-              final order = orders[index];
-              return _buildOrderCard(order);
-            },
-          );
-        },
+                        return ListView.separated(
+                          padding: const EdgeInsets.all(16),
+                          itemCount: orders.length,
+                          separatorBuilder: (c, i) =>
+                              const SizedBox(height: 16),
+                          itemBuilder: (context, index) {
+                            final order = orders[index];
+                            return _buildOrderCard(context, order);
+                          },
+                        );
+                      },
+                    ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildOrderCard(OrderModel order) {
+  Widget _buildOrderCard(BuildContext context, OrderModel order) {
     Color statusColor;
     switch (order.statusEnum) {
       case OrderStatus.preparing:
@@ -134,7 +190,7 @@ class OrderHistoryScreen extends StatelessWidget {
                     style: const TextStyle(color: AppColors.textPrimary),
                   ),
                   Text(
-                    "${item.price * item.quantity} T",
+                    "Rs. ${(item.price * item.quantity).toStringAsFixed(0)}",
                     style: const TextStyle(color: AppColors.textSecondary),
                   ),
                 ],
@@ -150,7 +206,7 @@ class OrderHistoryScreen extends StatelessWidget {
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               Text(
-                "${order.totalPrice} Tokens",
+                "Rs. ${order.totalPrice.toStringAsFixed(0)}",
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   color: AppColors.primary,
@@ -158,6 +214,21 @@ class OrderHistoryScreen extends StatelessWidget {
               ),
             ],
           ),
+          if (order.statusEnum == OrderStatus.completed) ...[
+            const SizedBox(height: 16),
+            CustomButton(
+              text: "LEAVE A REVIEW",
+              isSecondary: true,
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => AddReviewScreen(orderId: order.id),
+                  ),
+                );
+              },
+            ),
+          ],
         ],
       ),
     );

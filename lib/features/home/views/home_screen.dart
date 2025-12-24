@@ -1,14 +1,18 @@
 import 'package:fdsmart/core/widgets/app_header.dart';
-
 import 'package:fdsmart/core/theme/app_colors.dart';
 import 'package:fdsmart/core/widgets/offline_banner.dart';
 import 'package:fdsmart/features/auth/viewmodels/auth_view_model.dart';
+import 'package:fdsmart/features/auth/viewmodels/language_view_model.dart';
+import 'package:fdsmart/features/auth/views/profile_screen.dart';
+import 'package:fdsmart/features/home/views/notification_screen.dart';
 import 'package:fdsmart/features/home/widgets/category_card.dart';
 import 'package:fdsmart/features/home/widgets/special_offer_card.dart';
 import 'package:fdsmart/features/menu/views/menu_screen.dart';
+import 'package:fdsmart/features/menu/viewmodels/menu_view_model.dart';
 import 'package:fdsmart/features/orders/views/order_history_screen.dart';
-import 'package:fdsmart/features/orders/views/order_placement_screen.dart'; // For Floating Action Button eventually
+import 'package:fdsmart/features/orders/views/order_placement_screen.dart';
 import 'package:fdsmart/features/orders/viewmodels/order_view_model.dart';
+import 'package:fdsmart/features/orders/views/nutrition_tracker_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -21,19 +25,26 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
+  final TextEditingController _searchController = TextEditingController();
+
+  String _getGreeting() {
+    final hour = DateTime.now().hour;
+    if (hour < 12) return 'Good Morning,';
+    if (hour < 17) return 'Good Afternoon,';
+    return 'Good Evening,';
+  }
 
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<AuthViewModel>(context).currentUser;
     final userName = user?.name ?? 'Guest';
+    final langModel = Provider.of<LanguageViewModel>(context);
 
     final List<Widget> pages = [
-      _buildDashboard(userName),
+      _buildDashboard(userName, langModel),
       const MenuScreen(),
-      const OrderHistoryScreen(), // Linked OrderHistoryScreen
-      const Center(
-        child: Text("Profile Page Placeholder"),
-      ), // Replace with ProfileScreen
+      const OrderHistoryScreen(),
+      const ProfileScreen(),
     ];
 
     return Scaffold(
@@ -45,7 +56,6 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       floatingActionButton: Consumer<OrderViewModel>(
         builder: (context, orderModel, child) {
-          // We only show the cart button if items are in the cart.
           if (orderModel.cartItems.isEmpty) return const SizedBox.shrink();
           return FloatingActionButton.extended(
             backgroundColor: AppColors.primary,
@@ -81,26 +91,26 @@ class _HomeScreenState extends State<HomeScreen> {
           currentIndex: _currentIndex,
           onTap: (index) => setState(() => _currentIndex = index),
           type: BottomNavigationBarType.fixed,
-          backgroundColor: Colors.transparent, // Handled by container
+          backgroundColor: Colors.transparent,
           selectedItemColor: AppColors.primary,
           unselectedItemColor: AppColors.textSecondary,
           elevation: 0,
-          items: const [
+          items: [
             BottomNavigationBarItem(
-              icon: Icon(Icons.home_rounded),
-              label: 'Home',
+              icon: const Icon(Icons.home_rounded),
+              label: langModel.translate('home'),
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.restaurant_menu_rounded),
-              label: 'Menu',
+              icon: const Icon(Icons.restaurant_menu_rounded),
+              label: langModel.translate('menu'),
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.receipt_long_rounded),
-              label: 'Orders',
+              icon: const Icon(Icons.receipt_long_rounded),
+              label: langModel.translate('orders'),
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.person_rounded),
-              label: 'Profile',
+              icon: const Icon(Icons.person_rounded),
+              label: langModel.translate('profile'),
             ),
           ],
         ),
@@ -108,14 +118,15 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildDashboard(String userName) {
+  Widget _buildDashboard(String userName, LanguageViewModel langModel) {
     return SafeArea(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header
+            const AppHeader(),
+            const SizedBox(height: 24),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -123,39 +134,65 @@ class _HomeScreenState extends State<HomeScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Good Morning,',
-                      style: TextStyle(
+                      _getGreeting(),
+                      style: const TextStyle(
                         fontSize: 14,
                         color: AppColors.textSecondary,
                       ),
                     ),
-                    Text(
-                      userName,
-                      style: const TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
-                      ),
+                    Row(
+                      children: [
+                        Text(
+                          userName,
+                          style: const TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        IconButton(
+                          icon: const Icon(
+                            Icons.logout_rounded,
+                            size: 20,
+                            color: AppColors.error,
+                          ),
+                          onPressed: () {
+                            Provider.of<AuthViewModel>(
+                              context,
+                              listen: false,
+                            ).signOut();
+                            Navigator.pushReplacementNamed(context, '/login');
+                          },
+                        ),
+                      ],
                     ),
                   ],
                 ),
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: AppColors.surfaceLight,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.notifications_none_rounded,
-                    color: AppColors.textPrimary,
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const NotificationScreen(),
+                      ),
+                    );
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: const BoxDecoration(
+                      color: AppColors.surfaceLight,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.notifications_none_rounded,
+                      color: AppColors.textPrimary,
+                    ),
                   ),
                 ),
               ],
             ),
-
             const SizedBox(height: 24),
-
-            // Search Bar
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               height: 50,
@@ -163,34 +200,46 @@ class _HomeScreenState extends State<HomeScreen> {
                 color: AppColors.surfaceLight,
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Row(
-                children: [
-                  const Icon(Icons.search, color: AppColors.textSecondary),
-                  const SizedBox(width: 12),
-                  const Text(
-                    'Search for food, drinks...',
-                    style: TextStyle(color: AppColors.textSecondary),
+              child: TextField(
+                controller: _searchController,
+                style: const TextStyle(color: AppColors.textPrimary),
+                decoration: InputDecoration(
+                  hintText: langModel.translate('search_hint'),
+                  hintStyle: const TextStyle(color: AppColors.textSecondary),
+                  prefixIcon: const Icon(
+                    Icons.search,
+                    color: AppColors.textSecondary,
                   ),
-                ],
+                  border: InputBorder.none,
+                ),
+                onChanged: (val) {
+                  Provider.of<MenuViewModel>(
+                    context,
+                    listen: false,
+                  ).setSearchQuery(val);
+                },
               ),
             ),
-
             const SizedBox(height: 32),
-
-            // Today's Specials
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  "Today's Specials",
-                  style: TextStyle(
+                Text(
+                  langModel.translate('todays_specials'),
+                  style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: AppColors.textPrimary,
                   ),
                 ),
                 TextButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Provider.of<MenuViewModel>(
+                      context,
+                      listen: false,
+                    ).setSearchQuery("");
+                    setState(() => _currentIndex = 1);
+                  },
                   child: const Text(
                     "See All",
                     style: TextStyle(color: AppColors.primary),
@@ -200,33 +249,44 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const SizedBox(height: 16),
             SizedBox(
-              height: 200,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                physics: const BouncingScrollPhysics(),
-                children: const [
-                  SpecialOfferCard(
-                    title: "Burger Combo",
-                    price: "Tokens: 12",
-                    imageColor: Colors.orange,
-                    discount: "20% OFF",
-                  ),
-                  SizedBox(width: 16),
-                  SpecialOfferCard(
-                    title: "Cool Drinks",
-                    price: "Tokens: 5",
-                    imageColor: Colors.blue,
-                    discount: "Buy 1 Get 1",
-                  ),
-                ],
+              height: 180,
+              child: Consumer<MenuViewModel>(
+                builder: (context, menuModel, child) {
+                  final specials = menuModel.specialItems;
+                  if (menuModel.isLoading && specials.isEmpty) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  if (specials.isEmpty) {
+                    return Center(
+                      child: Container(
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: AppColors.surfaceLight,
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: const Text("Coming soon: Exclusive deals!"),
+                      ),
+                    );
+                  }
+                  return ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    physics: const BouncingScrollPhysics(),
+                    itemCount: specials.length,
+                    separatorBuilder: (c, i) => const SizedBox(width: 16),
+                    itemBuilder: (context, index) {
+                      final item = specials[index];
+                      return SpecialOfferCard(
+                        item: item,
+                        discount: index % 2 == 0 ? "20% OFF" : "SALE",
+                      );
+                    },
+                  );
+                },
               ),
             ),
-
             const SizedBox(height: 32),
-
-            // Categories / Quick Actions
             const Text(
-              "Explore Menu",
+              "Innovative Features",
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -243,35 +303,48 @@ class _HomeScreenState extends State<HomeScreen> {
               childAspectRatio: 1.1,
               children: [
                 CategoryCard(
-                  title: "Food Menu",
-                  icon: Icons.lunch_dining_rounded,
+                  title: langModel.translate('healthy_picks'),
+                  icon: Icons.eco_rounded,
+                  color: Colors.green,
+                  onTap: () {
+                    Provider.of<MenuViewModel>(
+                      context,
+                      listen: false,
+                    ).setSearchQuery("healthy");
+                    setState(() => _currentIndex = 1);
+                  },
+                ),
+                CategoryCard(
+                  title: langModel.translate('order_tracker'),
+                  icon: Icons.track_changes_rounded,
                   color: Colors.orange,
                   onTap: () {
-                    // Navigate to Food Tab in Menu
-                    setState(() => _currentIndex = 1);
+                    setState(() => _currentIndex = 2);
                   },
                 ),
                 CategoryCard(
-                  title: "Drinks",
-                  icon: Icons.local_cafe_rounded,
-                  color: Colors.brown,
-                  onTap: () {
-                    // Navigate to Drink Tab in Menu
-                    setState(() => _currentIndex = 1);
-                  },
-                ),
-                CategoryCard(
-                  title: "Favourites",
-                  icon: Icons.favorite_rounded,
-                  color: Colors.red,
-                  onTap: () {},
-                ),
-                CategoryCard(
-                  title: "My Orders",
-                  icon: Icons.history_edu_rounded,
+                  title: langModel.translate('nutrition_info'),
+                  icon: Icons.fitness_center_rounded,
                   color: Colors.teal,
                   onTap: () {
-                    setState(() => _currentIndex = 2);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const NutritionTrackerScreen(),
+                      ),
+                    );
+                  },
+                ),
+                CategoryCard(
+                  title: langModel.translate('favourites'),
+                  icon: Icons.favorite_rounded,
+                  color: Colors.red,
+                  onTap: () {
+                    Provider.of<MenuViewModel>(
+                      context,
+                      listen: false,
+                    ).setSearchQuery("fav:only");
+                    setState(() => _currentIndex = 1);
                   },
                 ),
               ],

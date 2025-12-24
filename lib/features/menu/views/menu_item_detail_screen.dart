@@ -18,11 +18,49 @@ class MenuItemDetailScreen extends StatefulWidget {
 class _MenuItemDetailScreenState extends State<MenuItemDetailScreen> {
   int quantity = 1;
 
+  Widget _buildImage() {
+    if (widget.item.imageUrl.startsWith('local:')) {
+      final assetName = widget.item.imageUrl.replaceFirst('local:', '');
+      return Image.asset(
+        'assets/images/$assetName',
+        fit: BoxFit.cover,
+        width: double.infinity,
+        height: double.infinity,
+        errorBuilder: (c, e, s) => const Center(
+          child: Icon(Icons.broken_image, color: Colors.grey, size: 50),
+        ),
+      );
+    } else if (widget.item.imageUrl.isNotEmpty) {
+      return Image.network(
+        widget.item.imageUrl,
+        fit: BoxFit.cover,
+        width: double.infinity,
+        height: double.infinity,
+        errorBuilder: (c, e, s) => const Center(
+          child: Icon(Icons.broken_image, color: Colors.grey, size: 50),
+        ),
+      );
+    } else {
+      return Container(
+        color: AppColors.surfaceLight,
+        child: Icon(
+          widget.item.category == 'food'
+              ? Icons.lunch_dining
+              : Icons.local_drink,
+          size: 100,
+          color: AppColors.textSecondary,
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
         leading: IconButton(
           icon: Container(
             padding: const EdgeInsets.all(8),
@@ -37,24 +75,13 @@ class _MenuItemDetailScreenState extends State<MenuItemDetailScreen> {
       ),
       body: Stack(
         children: [
-          // Background Image (or placeholder)
+          // Background Image
           Positioned(
             top: 0,
             left: 0,
             right: 0,
             height: MediaQuery.of(context).size.height * 0.45,
-            child: Container(
-              color: AppColors.surfaceLight,
-              child: widget.item.imageUrl.isNotEmpty
-                  ? Image.network(widget.item.imageUrl, fit: BoxFit.cover)
-                  : Icon(
-                      widget.item.category == 'food'
-                          ? Icons.lunch_dining
-                          : Icons.local_drink,
-                      size: 100,
-                      color: AppColors.textSecondary,
-                    ),
-            ),
+            child: _buildImage(),
           ),
 
           // Content Scrollable Sheet
@@ -96,7 +123,7 @@ class _MenuItemDetailScreenState extends State<MenuItemDetailScreen> {
                           ),
                         ),
                         Text(
-                          "${widget.item.price.toStringAsFixed(0)} Tokens",
+                          "Rs. ${widget.item.price.toStringAsFixed(0)}",
                           style: const TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
@@ -107,12 +134,12 @@ class _MenuItemDetailScreenState extends State<MenuItemDetailScreen> {
                     ),
                     const SizedBox(height: 8),
 
-                    // Rating and Availability
+                    // Rating and Calories
                     Row(
                       children: [
                         const Icon(
                           Icons.star_rounded,
-                          color: AppColors.secondary,
+                          color: Colors.orange,
                           size: 20,
                         ),
                         const SizedBox(width: 4),
@@ -120,26 +147,42 @@ class _MenuItemDetailScreenState extends State<MenuItemDetailScreen> {
                           widget.item.rating.toString(),
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
-                        const SizedBox(width: 16),
+                        const SizedBox(width: 20),
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.local_fire_department_rounded,
+                              color: Colors.orange,
+                              size: 16,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              "${widget.item.calories.toInt()} kcal",
+                              style: const TextStyle(
+                                color: AppColors.textSecondary,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const Spacer(),
                         Container(
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
+                            horizontal: 10,
                             vertical: 4,
                           ),
                           decoration: BoxDecoration(
                             color: widget.item.isAvailable
-                                ? AppColors.success.withOpacity(0.1)
-                                : AppColors.error.withOpacity(0.1),
+                                ? Colors.green.withOpacity(0.1)
+                                : Colors.red.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
-                            widget.item.isAvailable
-                                ? "Available"
-                                : "Out of Stock",
+                            widget.item.isAvailable ? "Available" : "Stock Out",
                             style: TextStyle(
                               color: widget.item.isAvailable
-                                  ? AppColors.success
-                                  : AppColors.error,
+                                  ? Colors.green
+                                  : Colors.red,
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
                             ),
@@ -163,6 +206,7 @@ class _MenuItemDetailScreenState extends State<MenuItemDetailScreen> {
                       style: const TextStyle(
                         color: AppColors.textSecondary,
                         height: 1.5,
+                        fontSize: 15,
                       ),
                     ),
 
@@ -216,14 +260,14 @@ class _MenuItemDetailScreenState extends State<MenuItemDetailScreen> {
 
           // Bottom Cart Button
           Positioned(
-            bottom: 20,
-            left: 20,
-            right: 20,
+            bottom: 24,
+            left: 24,
+            right: 24,
             child: Consumer<OrderViewModel>(
               builder: (context, orderModel, child) {
                 return CustomButton(
                   text:
-                      "ADD TO ORDER  •  ${(widget.item.price * quantity).toStringAsFixed(0)} T",
+                      "ADD TO ORDER  •  Rs. ${(widget.item.price * quantity).toStringAsFixed(0)}",
                   isLoading: orderModel.isLoading,
                   onPressed: () {
                     final orderItem = OrderItemModel(
@@ -232,9 +276,7 @@ class _MenuItemDetailScreenState extends State<MenuItemDetailScreen> {
                       price: widget.item.price,
                       quantity: quantity,
                     );
-
                     orderModel.addToCart(orderItem);
-
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(

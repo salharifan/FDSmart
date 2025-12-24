@@ -1,8 +1,9 @@
 import 'package:fdsmart/core/theme/app_colors.dart';
-import 'package:fdsmart/core/widgets/app_header.dart';
+
 import 'package:fdsmart/core/widgets/custom_button.dart';
 import 'package:fdsmart/core/widgets/custom_text_field.dart';
 import 'package:fdsmart/features/auth/viewmodels/auth_view_model.dart';
+import 'package:fdsmart/features/auth/views/forgot_password_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -76,14 +77,39 @@ class _LoginScreenState extends State<LoginScreen> {
             children: [
               const SizedBox(height: 40),
               // Logo or Title
-              const Center(child: AppHeader()),
-              const SizedBox(height: 40),
-
+              Center(
+                child: Container(
+                  height: 100,
+                  width: 100,
+                  decoration: BoxDecoration(
+                    // color: AppColors.primary.withOpacity(0.2),
+                    // shape: BoxShape.circle,
+                    borderRadius: BorderRadius.circular(16),
+                    image: const DecorationImage(
+                      image: AssetImage('assets/images/logo.png'),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
               const Center(
                 child: Text(
-                  'Smart Canteen Ordering',
+                  'FDSmart',
+                  style: TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+              const Center(
+                child: Text(
+                  'Healthier Choices, Smarter Orders',
                   style: TextStyle(
                     fontSize: 16,
+                    fontStyle: FontStyle.italic,
                     color: AppColors.textSecondary,
                   ),
                 ),
@@ -105,7 +131,28 @@ class _LoginScreenState extends State<LoginScreen> {
                 isPassword: true,
               ),
 
-              const SizedBox(height: 40),
+              Align(
+                alignment: Alignment.center,
+                child: TextButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const ForgotPasswordScreen(),
+                      ),
+                    );
+                  },
+                  child: const Text(
+                    "Forgot Password?",
+                    style: TextStyle(
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 20),
 
               Consumer<AuthViewModel>(
                 builder: (context, model, child) {
@@ -117,53 +164,26 @@ class _LoginScreenState extends State<LoginScreen> {
                 },
               ),
 
-              const SizedBox(height: 20),
-              CustomButton(
-                text: 'CREATE ACCOUNT',
-                isSecondary: true,
-                onPressed: () {
-                  // Navigate to Register
-                  Navigator.pushNamed(context, '/register');
-                },
-              ),
+              const SizedBox(height: 32),
 
-              const SizedBox(height: 40),
-              // Demo Hint
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: AppColors.surfaceLight,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: AppColors.secondary.withOpacity(0.3),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    "Don't have an account? ",
+                    style: TextStyle(color: AppColors.textSecondary),
                   ),
-                ),
-                child: Column(
-                  children: const [
-                    Text(
-                      "DEMO ACCOUNTS (Offline Test)",
+                  GestureDetector(
+                    onTap: () => Navigator.pushNamed(context, '/register'),
+                    child: const Text(
+                      "Sign Up",
                       style: TextStyle(
+                        color: AppColors.primary,
                         fontWeight: FontWeight.bold,
-                        color: AppColors.secondary,
                       ),
                     ),
-                    SizedBox(height: 8),
-                    Text(
-                      "Student: user@demo.com / 123456",
-                      style: TextStyle(
-                        color: AppColors.textSecondary,
-                        fontSize: 12,
-                      ),
-                    ),
-                    Text(
-                      "Admin: admin@demo.com / 123456",
-                      style: TextStyle(
-                        color: AppColors.textSecondary,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ],
           ),

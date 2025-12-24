@@ -7,6 +7,10 @@ class MenuItemModel {
   final String category; // 'food' or 'drink'
   final bool isAvailable;
   final double rating;
+  final double calories;
+
+  final bool isSpecial;
+  final String tag; // e.g. 'healthy', 'new', etc.
 
   MenuItemModel({
     required this.id,
@@ -17,6 +21,9 @@ class MenuItemModel {
     required this.category,
     this.isAvailable = true,
     this.rating = 4.5,
+    this.calories = 200.0,
+    this.isSpecial = false,
+    this.tag = '',
   });
 
   factory MenuItemModel.fromMap(Map<String, dynamic> data, String id) {
@@ -29,6 +36,9 @@ class MenuItemModel {
       category: data['category'] ?? 'food',
       isAvailable: data['isAvailable'] ?? true,
       rating: (data['rating'] ?? 4.5).toDouble(),
+      calories: (data['calories'] ?? 200.0).toDouble(),
+      isSpecial: data['isSpecial'] ?? false,
+      tag: data['tag'] ?? '',
     );
   }
 
@@ -41,6 +51,9 @@ class MenuItemModel {
       'category': category,
       'isAvailable': isAvailable,
       'rating': rating,
+      'calories': calories,
+      'isSpecial': isSpecial,
+      'tag': tag,
     };
   }
 }
