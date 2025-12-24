@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "1054949292448",
+    "project_id": "fdsmart-fdace",
+    "storage_bucket": "fdsmart-fdace.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1054949292448:android:d0f12331a01963426e4cc5",
+        "android_client_info": {
+          "package_name": "com.fdsmart.fdsmart"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1054949292448-0jqsniftthalhdaklqr9b5oqipbuspdr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDQyVQt8xbdGOAnELM6LuLP5wvNDPQY_DI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1054949292448-0jqsniftthalhdaklqr9b5oqipbuspdr.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1054949292448-gacha5hf7kamkogi63df659gldhdkla0.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.fdsmart.fdsmart"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
