@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:fdsmart/core/theme/app_colors.dart';
 
 class AppHeader extends StatelessWidget {
   final bool showBack;
@@ -12,7 +11,12 @@ class AppHeader extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: const BoxDecoration(color: AppColors.surfaceLight),
+      decoration: const BoxDecoration(
+        color: Color(0xFFF8F9FA), // Off-white
+        boxShadow: [
+          BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2)),
+        ],
+      ),
       child: Row(
         children: [
           if (showBack || Navigator.canPop(context))
@@ -21,7 +25,7 @@ class AppHeader extends StatelessWidget {
               child: IconButton(
                 icon: const Icon(
                   Icons.arrow_back_ios_new_rounded,
-                  color: AppColors.textPrimary,
+                  color: Color(0xFF333333), // Dark grey
                   size: 20,
                 ),
                 onPressed: onBack ?? () => Navigator.pop(context),
@@ -48,7 +52,7 @@ class AppHeader extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
+                  color: Color(0xFF222222), // Near black
                 ),
               ),
               Text(
@@ -56,7 +60,7 @@ class AppHeader extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 11,
                   fontStyle: FontStyle.italic,
-                  color: AppColors.textPrimary.withOpacity(0.9),
+                  color: Color(0xFF666666), // Medium grey
                 ),
               ),
             ],

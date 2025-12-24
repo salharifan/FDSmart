@@ -176,10 +176,35 @@ class AuthViewModel extends ChangeNotifier {
 
   // Fetch User Details
   Future<void> _fetchUserDetails(String uid) async {
-    DocumentSnapshot doc = await _firestore.collection('users').doc(uid).get();
-    if (doc.exists) {
-      _currentUser = UserModel.fromMap(doc.data() as Map<String, dynamic>, uid);
+    try {
+      DocumentSnapshot doc = await _firestore
+          .collection('users')
+          .doc(uid)
+          .get();
+      if (doc.exists) {
+        _currentUser = UserModel.fromMap(
+          doc.data() as Map<String, dynamic>,
+          uid,
+        );
+      } else {
+        // Fallback for users without a profile doc (e.g. legacy or demo users)
+        final firebaseUser = _auth.currentUser;
+        if (firebaseUser != null) {
+          _currentUser = UserModel(
+            uid: uid,
+            email: firebaseUser.email ?? 'user@fdsmart.com',
+            role: 'user',
+            name:
+                firebaseUser.displayName ??
+                firebaseUser.email?.split('@')[0] ??
+                'User',
+            phone: firebaseUser.phoneNumber ?? '',
+          );
+        }
+      }
       notifyListeners();
+    } catch (e) {
+      print("Error fetching user details: $e");
     }
   }
 

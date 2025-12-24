@@ -70,14 +70,10 @@ class MenuViewModel extends ChangeNotifier {
     try {
       final snapshot = await _firestore.collection('menu_items').get();
 
-      // Force re-seed if the first item isn't one of our new ones
-      bool needsReseed = snapshot.docs.isEmpty;
-      if (!needsReseed) {
-        final firstItemName = snapshot.docs.first.data()['name'] as String?;
-        if (firstItemName == null || !firstItemName.contains('AVOCADO')) {
-          needsReseed = true;
-        }
-      }
+      // Re-seed only if empty or missing new deals
+      bool needsReseed =
+          snapshot.docs.isEmpty ||
+          !snapshot.docs.any((doc) => doc.data().toString().contains('DEAL'));
 
       if (needsReseed) {
         // Clear existing items if any
@@ -85,7 +81,7 @@ class MenuViewModel extends ChangeNotifier {
           await _firestore.collection('menu_items').doc(doc.id).delete();
         }
 
-        // SEED DB with professional menu
+        // SEED DB with professional menu and DEALS
         final dummy = _getDummyData();
         final batch = _firestore.batch();
         for (var item in dummy) {
@@ -148,20 +144,21 @@ class MenuViewModel extends ChangeNotifier {
         id: '1',
         name: 'AVOCADO GREEN SALAD (VEG)',
         description:
-            'Fresh organic healthy greens with sliced avocado, cherry tomatoes, and balsamic glaze. Perfect healthy choice.',
-        price: 450.0,
+            'TODAY\'S DEAL: Fresh organic healthy greens with sliced avocado. Best seller.',
+        price: 399.0,
         imageUrl: 'local:Green salad.jpg',
         category: 'food',
         rating: 4.8,
         calories: 180,
         tag: 'healthy',
+        isSpecial: true,
       ),
       MenuItemModel(
         id: '2',
         name: 'GREEK SALMON BOWL',
         description:
-            'Pan-seared salmon with quinoa, cucumber, feta cheese, and olives. A healthy choice.',
-        price: 1250.0,
+            'LIMITED TIME DEAL: Pan-seared salmon with quinoa and feta. Pure healthy energy.',
+        price: 899.0,
         imageUrl: 'local:greek salmon.jpg',
         category: 'food',
         rating: 4.9,
@@ -170,10 +167,35 @@ class MenuViewModel extends ChangeNotifier {
         isSpecial: true,
       ),
       MenuItemModel(
+        id: '7',
+        name: 'CLASSIC BURGER & FRIES',
+        description:
+            'COMBO DEAL: Premium beef patty with melted cheese and crispy golden fries.',
+        price: 750.0,
+        imageUrl: 'local:burger with fries.png',
+        category: 'food',
+        rating: 4.7,
+        calories: 850,
+        isSpecial: true,
+      ),
+      MenuItemModel(
+        id: '12',
+        name: 'PROTEIN MILKSHAKE',
+        description:
+            'POST-WORKOUT DEAL: High-quality whey protein blend. Perfect healthy recovery.',
+        price: 450.0,
+        imageUrl: 'local:protein milkshakes.jpg',
+        category: 'drink',
+        rating: 4.8,
+        calories: 350,
+        tag: 'healthy',
+        isSpecial: true,
+      ),
+      MenuItemModel(
         id: '3',
         name: 'HEARTY LENTIL SOUP (VEG)',
         description:
-            'Warm and hearty lentil soup with garden healthy vegetables and aromatic spices.',
+            'Warm and hearty lentil soup with garden healthy vegetables.',
         price: 300.0,
         imageUrl: 'local:lentil soup.jpg',
         category: 'food',
@@ -215,18 +237,6 @@ class MenuViewModel extends ChangeNotifier {
         calories: 680,
       ),
       MenuItemModel(
-        id: '7',
-        name: 'CLASSIC BURGER & FRIES',
-        description:
-            'Premium beef patty with melted cheese, served with crispy golden fries.',
-        price: 950.0,
-        imageUrl: 'local:burger with fries.png',
-        category: 'food',
-        rating: 4.7,
-        calories: 850,
-        isSpecial: true,
-      ),
-      MenuItemModel(
         id: '8',
         name: 'CHOCOLATE WAFFLE',
         description:
@@ -252,7 +262,7 @@ class MenuViewModel extends ChangeNotifier {
         id: '10',
         name: 'AVOCADO JUICE (HEALTHY)',
         description:
-            'Creamy and nutritious healthy avocado blend with a hint of honey. High in healthy fats.',
+            'Creamy and nutritious healthy avocado blend. High in healthy fats.',
         price: 400.0,
         imageUrl: 'local:avacado juice.png',
         category: 'drink',
@@ -264,7 +274,7 @@ class MenuViewModel extends ChangeNotifier {
         id: '11',
         name: 'KOLA KANDA (HEALTHY)',
         description:
-            'Traditional herbal gruel made with medicinal healthy greens and rice. Ultimate healthy drink.',
+            'Traditional herbal healthy greens and rice. Ultimate healthy drink.',
         price: 180.0,
         imageUrl: 'local:kola kanda drink.jpg',
         category: 'drink',
@@ -273,23 +283,9 @@ class MenuViewModel extends ChangeNotifier {
         tag: 'healthy',
       ),
       MenuItemModel(
-        id: '12',
-        name: 'PROTEIN MILKSHAKE',
-        description:
-            'Whey protein blended with milk and banana. Perfect healthy recovery.',
-        price: 600.0,
-        imageUrl: 'local:protein milkshakes.jpg',
-        category: 'drink',
-        rating: 4.8,
-        calories: 350,
-        tag: 'healthy',
-        isSpecial: true,
-      ),
-      MenuItemModel(
         id: '13',
         name: 'MASALA CHAI',
-        description:
-            'Indian style black tea brewed with aromatic spices and milk.',
+        description: 'Indian style black tea brewed with aromatic spices.',
         price: 150.0,
         imageUrl: 'local:chai.jpg',
         category: 'drink',
@@ -309,7 +305,7 @@ class MenuViewModel extends ChangeNotifier {
       MenuItemModel(
         id: '15',
         name: 'CHILLED PEPSI',
-        description: 'Refresh yourself with a classic chilled Pepsi Classic.',
+        description: 'Refresh yourself with a classic chilled Pepsi.',
         price: 120.0,
         imageUrl: 'local:pepsi.png',
         category: 'drink',

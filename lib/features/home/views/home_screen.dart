@@ -37,7 +37,14 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<AuthViewModel>(context).currentUser;
-    final userName = user?.name ?? 'Guest';
+    final String userName;
+    if (user != null) {
+      userName = (user.name != null && user.name!.isNotEmpty)
+          ? user.name!
+          : (user.email.split('@')[0]);
+    } else {
+      userName = 'User';
+    }
     final langModel = Provider.of<LanguageViewModel>(context);
 
     final List<Widget> pages = [
@@ -134,40 +141,37 @@ class _HomeScreenState extends State<HomeScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      _getGreeting(),
+                      "${_getGreeting()} $userName!",
                       style: const TextStyle(
+                        fontSize: 26,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textPrimary,
+                        letterSpacing: -0.5,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    const Text(
+                      "What would you like to eat today?",
+                      style: TextStyle(
                         fontSize: 14,
                         color: AppColors.textSecondary,
                       ),
                     ),
-                    Row(
-                      children: [
-                        Text(
-                          userName,
-                          style: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.textPrimary,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        IconButton(
-                          icon: const Icon(
-                            Icons.logout_rounded,
-                            size: 20,
-                            color: AppColors.error,
-                          ),
-                          onPressed: () {
-                            Provider.of<AuthViewModel>(
-                              context,
-                              listen: false,
-                            ).signOut();
-                            Navigator.pushReplacementNamed(context, '/login');
-                          },
-                        ),
-                      ],
-                    ),
                   ],
+                ),
+                IconButton(
+                  icon: const Icon(
+                    Icons.logout_rounded,
+                    size: 22,
+                    color: AppColors.error,
+                  ),
+                  onPressed: () {
+                    Provider.of<AuthViewModel>(
+                      context,
+                      listen: false,
+                    ).signOut();
+                    Navigator.pushReplacementNamed(context, '/login');
+                  },
                 ),
                 GestureDetector(
                   onTap: () {
