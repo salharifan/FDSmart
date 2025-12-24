@@ -153,17 +153,36 @@ class MyReviewsScreen extends StatelessWidget {
                                           );
                                         }),
                                       ),
-                                      Text(
-                                        data['createdAt'] != null
-                                            ? DateFormat('MMM dd, yyyy').format(
-                                                (data['createdAt'] as Timestamp)
-                                                    .toDate(),
-                                              )
-                                            : "",
-                                        style: const TextStyle(
-                                          fontSize: 12,
-                                          color: AppColors.textSecondary,
-                                        ),
+                                      Row(
+                                        children: [
+                                          Text(
+                                            data['createdAt'] != null
+                                                ? DateFormat(
+                                                    'MMM dd, yyyy',
+                                                  ).format(
+                                                    (data['createdAt']
+                                                            as Timestamp)
+                                                        .toDate(),
+                                                  )
+                                                : "",
+                                            style: const TextStyle(
+                                              fontSize: 12,
+                                              color: AppColors.textSecondary,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 8),
+                                          GestureDetector(
+                                            onTap: () => _deleteReview(
+                                              context,
+                                              sortedDocs[index].id,
+                                            ),
+                                            child: const Icon(
+                                              Icons.delete_outline_rounded,
+                                              color: AppColors.error,
+                                              size: 18,
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ],
                                   ),
@@ -201,5 +220,45 @@ class MyReviewsScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void _deleteReview(BuildContext context, String reviewId) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Delete Review?"),
+        content: const Text("Are you sure you want to remove this review?"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text("CANCEL", style: TextStyle(color: Colors.grey)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text("DELETE", style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      try {
+        await FirebaseFirestore.instance
+            .collection('reviews')
+            .doc(reviewId)
+            .delete();
+        if (context.mounted) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text("Review deleted")));
+        }
+      } catch (e) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text("Error deleting review: $e")));
+        }
+      }
+    }
   }
 }
