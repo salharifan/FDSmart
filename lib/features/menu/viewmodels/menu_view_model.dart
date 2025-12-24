@@ -85,7 +85,7 @@ class MenuViewModel extends ChangeNotifier {
           await _firestore.collection('menu_items').doc(doc.id).delete();
         }
 
-        // SEED DB with new professional menu
+        // SEED DB with professional menu
         final dummy = _getDummyData();
         final batch = _firestore.batch();
         for (var item in dummy) {
@@ -94,7 +94,7 @@ class MenuViewModel extends ChangeNotifier {
         }
         await batch.commit();
 
-        // Recursive call (guarded by isLoading)
+        // Recursive call
         _isLoading = false;
         return await fetchMenuItems();
       } else {
@@ -113,31 +113,29 @@ class MenuViewModel extends ChangeNotifier {
   Future<void> addMenuItem(MenuItemModel item) async {
     try {
       await _firestore.collection('menu_items').add(item.toMap());
-      await fetchMenuItems(); // Refresh
+      await fetchMenuItems();
     } catch (e) {
       _errorMessage = "Failed to add item: $e";
       notifyListeners();
     }
   }
 
-  // Delete Item
   Future<void> deleteMenuItem(String id) async {
     try {
       await _firestore.collection('menu_items').doc(id).delete();
-      await fetchMenuItems(); // Refresh
+      await fetchMenuItems();
     } catch (e) {
       _errorMessage = "Failed to delete item: $e";
       notifyListeners();
     }
   }
 
-  // Toggle Availability
   Future<void> toggleAvailability(String id, bool isAvailable) async {
     try {
       await _firestore.collection('menu_items').doc(id).update({
         'isAvailable': isAvailable,
       });
-      await fetchMenuItems(); // Refresh
+      await fetchMenuItems();
     } catch (e) {
       _errorMessage = "Failed to update availability: $e";
       notifyListeners();
