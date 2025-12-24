@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:fdsmart/core/widgets/app_header.dart';
 import 'package:fdsmart/core/theme/app_colors.dart';
 import 'package:fdsmart/core/widgets/offline_banner.dart';
@@ -13,6 +14,7 @@ import 'package:fdsmart/features/orders/views/order_history_screen.dart';
 import 'package:fdsmart/features/orders/views/order_placement_screen.dart';
 import 'package:fdsmart/features/orders/viewmodels/order_view_model.dart';
 import 'package:fdsmart/features/orders/views/nutrition_tracker_screen.dart';
+import 'package:fdsmart/features/orders/models/order_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -26,6 +28,74 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
   final TextEditingController _searchController = TextEditingController();
+  StreamSubscription? _orderSubscription;
+  final Set<String> _notifiedOrders = {};
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _setupNotificationListener();
+    });
+  }
+
+  @override
+  void dispose() {
+    _orderSubscription?.cancel();
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _setupNotificationListener() {
+    final auth = Provider.of<AuthViewModel>(context, listen: false);
+    final orderModel = Provider.of<OrderViewModel>(context, listen: false);
+    final userId = auth.currentUser?.uid;
+
+    if (userId != null) {
+      _orderSubscription = orderModel.getMyOrdersStream(userId).listen((
+        orders,
+      ) {
+        for (var order in orders) {
+          final key = "${order.id}_${order.status}";
+          if ((order.status == 'ready' || order.status == 'completed') &&
+              !_notifiedOrders.contains(key)) {
+            _notifiedOrders.add(key);
+            _showNotification(order);
+          }
+        }
+      });
+    }
+  }
+
+  void _showNotification(OrderModel order) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.notifications_active, color: Colors.white),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                "Order #${order.tokenNumber} is ${order.status.toUpperCase()}!",
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: order.status == 'ready'
+            ? AppColors.success
+            : AppColors.info,
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 4),
+        action: SnackBarAction(
+          label: "HISTORY",
+          textColor: Colors.white,
+          onPressed: () => setState(() => _currentIndex = 2),
+        ),
+      ),
+    );
+  }
 
   String _getGreeting() {
     final hour = DateTime.now().hour;
@@ -63,7 +133,12 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       floatingActionButton: Consumer<OrderViewModel>(
         builder: (context, orderModel, child) {
-          if (orderModel.cartItems.isEmpty) return const SizedBox.shrink();
+          final user = Provider.of<AuthViewModel>(
+            context,
+            listen: false,
+          ).currentUser;
+          if (orderModel.cartItems.isEmpty || user?.role == 'admin')
+            return const SizedBox.shrink();
           return FloatingActionButton.extended(
             backgroundColor: AppColors.primary,
             icon: const Icon(Icons.shopping_cart, color: Colors.white),

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:fdsmart/features/auth/viewmodels/auth_view_model.dart';
+import 'package:provider/provider.dart';
 
 class AppHeader extends StatelessWidget {
   final bool showBack;
@@ -47,13 +49,42 @@ class AppHeader extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text(
-                'FDSmart',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF222222), // Near black
-                ),
+              Row(
+                children: [
+                  const Text(
+                    'FDSmart',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF222222), // Near black
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Consumer<AuthViewModel>(
+                    builder: (context, auth, child) {
+                      final role = auth.currentUser?.role;
+                      if (role == null) return const SizedBox.shrink();
+                      return Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: role == 'admin' ? Colors.red : Colors.blue,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          role.toUpperCase(),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 8,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ],
               ),
               Text(
                 'Healthier Choices, Smarter Orders',

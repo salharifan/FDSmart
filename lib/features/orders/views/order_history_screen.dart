@@ -11,11 +11,13 @@ import 'package:provider/provider.dart';
 import 'package:fdsmart/core/widgets/app_header.dart';
 
 class OrderHistoryScreen extends StatelessWidget {
-  const OrderHistoryScreen({super.key});
+  final String? userId;
+  const OrderHistoryScreen({super.key, this.userId});
 
   @override
   Widget build(BuildContext context) {
-    final userId = Provider.of<AuthViewModel>(context).currentUser?.uid;
+    final effectiveUserId =
+        userId ?? Provider.of<AuthViewModel>(context).currentUser?.uid;
     final orderViewModel = Provider.of<OrderViewModel>(context, listen: false);
 
     return Scaffold(
@@ -23,18 +25,21 @@ class OrderHistoryScreen extends StatelessWidget {
         child: Column(
           children: [
             const AppHeader(),
-            const Padding(
-              padding: EdgeInsets.all(16.0),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
               child: Text(
-                "My Orders",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                userId != null ? "User Order History" : "My Orders",
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
             Expanded(
-              child: userId == null
+              child: effectiveUserId == null
                   ? const Center(child: Text("Please login to view orders"))
                   : StreamBuilder<List<OrderModel>>(
-                      stream: orderViewModel.getMyOrdersStream(userId),
+                      stream: orderViewModel.getMyOrdersStream(effectiveUserId),
                       builder: (context, snapshot) {
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {

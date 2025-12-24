@@ -1,5 +1,6 @@
 import 'package:fdsmart/core/theme/app_colors.dart';
 import 'package:fdsmart/core/widgets/custom_button.dart';
+import 'package:fdsmart/features/auth/viewmodels/auth_view_model.dart';
 import 'package:fdsmart/features/menu/models/menu_item_model.dart';
 import 'package:fdsmart/features/orders/models/order_model.dart';
 import 'package:fdsmart/features/orders/viewmodels/order_view_model.dart';
@@ -213,44 +214,56 @@ class _MenuItemDetailScreenState extends State<MenuItemDetailScreen> {
                     const SizedBox(height: 32),
 
                     // Quantity Selector
-                    Row(
-                      children: [
-                        const Text(
-                          "Quantity",
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const Spacer(),
-                        Container(
-                          decoration: BoxDecoration(
-                            color: AppColors.surfaceLight,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Row(
-                            children: [
-                              IconButton(
-                                icon: const Icon(Icons.remove),
-                                onPressed: quantity > 1
-                                    ? () => setState(() => quantity--)
-                                    : null,
+                    Consumer<AuthViewModel>(
+                      builder: (context, auth, child) {
+                        if (auth.currentUser?.role == 'admin')
+                          return const SizedBox.shrink();
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              "Quantity",
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
                               ),
-                              Text(
-                                quantity.toString(),
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                            ),
+                            const SizedBox(height: 12),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
                               ),
-                              IconButton(
-                                icon: const Icon(Icons.add),
-                                onPressed: () => setState(() => quantity++),
+                              decoration: BoxDecoration(
+                                color: AppColors.surfaceLight,
+                                borderRadius: BorderRadius.circular(12),
                               ),
-                            ],
-                          ),
-                        ),
-                      ],
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(Icons.remove),
+                                    onPressed: () {
+                                      if (quantity > 1)
+                                        setState(() => quantity--);
+                                    },
+                                  ),
+                                  Text(
+                                    quantity.toString(),
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.add),
+                                    onPressed: () => setState(() => quantity++),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        );
+                      },
                     ),
                   ],
                 ),
@@ -263,8 +276,10 @@ class _MenuItemDetailScreenState extends State<MenuItemDetailScreen> {
             bottom: 24,
             left: 24,
             right: 24,
-            child: Consumer<OrderViewModel>(
-              builder: (context, orderModel, child) {
+            child: Consumer2<OrderViewModel, AuthViewModel>(
+              builder: (context, orderModel, auth, child) {
+                if (auth.currentUser?.role == 'admin')
+                  return const SizedBox.shrink();
                 return CustomButton(
                   text:
                       "ADD TO ORDER  •  Rs. ${(widget.item.price * quantity).toStringAsFixed(0)}",

@@ -4,12 +4,14 @@ import 'package:fdsmart/core/widgets/app_header.dart';
 import 'package:fdsmart/features/auth/viewmodels/auth_view_model.dart';
 import 'package:fdsmart/features/auth/views/settings_screen.dart';
 import 'package:fdsmart/features/orders/views/my_reviews_screen.dart';
+import 'package:fdsmart/features/orders/views/order_history_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key});
+  final bool showHeader;
+  const ProfileScreen({super.key, this.showHeader = true});
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +25,7 @@ class ProfileScreen extends StatelessWidget {
               padding: const EdgeInsets.all(20),
               child: Column(
                 children: [
-                  const AppHeader(),
+                  if (showHeader) const AppHeader(),
                   const SizedBox(height: 32),
 
                   // Profile Avatar with Edit Icon
@@ -100,13 +102,17 @@ class ProfileScreen extends StatelessWidget {
                   const SizedBox(height: 32),
 
                   // Wallet & Features Section
-                  _buildProfileItem(
-                    icon: Icons.history_rounded,
-                    title: "Order History",
-                    onTap: () {
-                      // Handled by main navigation (tab index)
-                    },
-                  ),
+                  if (user?.role != 'admin')
+                    _buildProfileItem(
+                      icon: Icons.history_rounded,
+                      title: "Order History",
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const OrderHistoryScreen(),
+                        ),
+                      ),
+                    ),
 
                   _buildProfileItem(
                     icon: Icons.edit_rounded,
@@ -114,16 +120,17 @@ class ProfileScreen extends StatelessWidget {
                     onTap: () => _showEditProfileDialog(context, authViewModel),
                   ),
 
-                  _buildProfileItem(
-                    icon: Icons.rate_review_rounded,
-                    title: "My Reviews",
-                    onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const MyReviewsScreen(),
+                  if (user?.role != 'admin')
+                    _buildProfileItem(
+                      icon: Icons.rate_review_rounded,
+                      title: "My Reviews",
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const MyReviewsScreen(),
+                        ),
                       ),
                     ),
-                  ),
 
                   _buildProfileItem(
                     icon: Icons.settings_rounded,
@@ -169,47 +176,94 @@ class ProfileScreen extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text("Edit Profile"),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: nameCtrl,
-              decoration: const InputDecoration(labelText: "Full Name"),
-            ),
-            TextField(
-              controller: phoneCtrl,
-              decoration: const InputDecoration(labelText: "Phone Number"),
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton.icon(
-              onPressed: () {
-                _pickImage(model);
-                Navigator.pop(context);
-              },
-              icon: const Icon(Icons.image),
-              label: const Text("Change Photo"),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: Colors.white,
-              ),
-            ),
-          ],
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text(
+          "Update Account Details",
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
+        content: Container(
+          width: double.maxFinite,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                "Update your information below to keep your profile current.",
+                style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+              ),
+              const SizedBox(height: 24),
+              TextField(
+                controller: nameCtrl,
+                decoration: InputDecoration(
+                  labelText: "Full Name",
+                  hintText: "Enter your full name",
+                  prefixIcon: const Icon(Icons.person_outline),
+                  filled: true,
+                  fillColor: AppColors.surfaceLight,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: phoneCtrl,
+                decoration: InputDecoration(
+                  labelText: "Phone Number",
+                  hintText: "e.g. +94 77 123 4567",
+                  prefixIcon: const Icon(Icons.phone_outlined),
+                  filled: true,
+                  fillColor: AppColors.surfaceLight,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: () => _pickImage(model),
+                  icon: const Icon(Icons.photo_library_outlined),
+                  label: const Text("Change Profile Photo"),
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    side: const BorderSide(color: AppColors.primary),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        actionsPadding: const EdgeInsets.all(16),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text("Cancel"),
+            child: const Text("CLOSE", style: TextStyle(color: Colors.grey)),
           ),
           ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            ),
             onPressed: () async {
               await model.updateProfile(
                 name: nameCtrl.text,
                 phone: phoneCtrl.text,
               );
-              Navigator.pop(context);
+              if (context.mounted) Navigator.pop(context);
             },
-            child: const Text("Save"),
+            child: const Text(
+              "SAVE CHANGES",
+              style: TextStyle(color: Colors.white),
+            ),
           ),
         ],
       ),

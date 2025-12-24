@@ -116,6 +116,19 @@ class MenuViewModel extends ChangeNotifier {
     }
   }
 
+  Future<void> updateMenuItem(MenuItemModel item) async {
+    try {
+      await _firestore
+          .collection('menu_items')
+          .doc(item.id)
+          .update(item.toMap());
+      await fetchMenuItems();
+    } catch (e) {
+      _errorMessage = "Failed to update item: $e";
+      notifyListeners();
+    }
+  }
+
   Future<void> deleteMenuItem(String id) async {
     try {
       await _firestore.collection('menu_items').doc(id).delete();
