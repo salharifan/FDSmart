@@ -289,16 +289,111 @@ class _HomeScreenState extends State<HomeScreen> {
                     Icons.search,
                     color: AppColors.textSecondary,
                   ),
+                  suffixIcon: _searchController.text.isNotEmpty
+                      ? IconButton(
+                          icon: const Icon(
+                            Icons.clear,
+                            color: AppColors.textSecondary,
+                          ),
+                          onPressed: () {
+                            _searchController.clear();
+                            Provider.of<MenuViewModel>(
+                              context,
+                              listen: false,
+                            ).setSearchQuery("");
+                          },
+                        )
+                      : null,
                   border: InputBorder.none,
                 ),
                 onChanged: (val) {
+                  setState(() {}); // Update UI to show/hide clear button
                   Provider.of<MenuViewModel>(
                     context,
                     listen: false,
                   ).setSearchQuery(val);
                 },
+                onSubmitted: (val) {
+                  if (val.isNotEmpty) {
+                    // Navigate to Menu tab when user presses enter
+                    setState(() => _currentIndex = 1);
+                  }
+                },
               ),
             ),
+            // Show search results preview if searching
+            if (_searchController.text.isNotEmpty)
+              Consumer<MenuViewModel>(
+                builder: (context, menuModel, child) {
+                  final searchResults = menuModel.itemsWithFavorites(
+                    Provider.of<AuthViewModel>(
+                          context,
+                        ).currentUser?.favorites ??
+                        [],
+                  );
+                  if (searchResults.isEmpty) {
+                    return Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Text(
+                        "No items found for '${_searchController.text}'",
+                        style: const TextStyle(
+                          color: AppColors.textSecondary,
+                          fontSize: 14,
+                        ),
+                      ),
+                    );
+                  }
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 16),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Found ${searchResults.length} items",
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: AppColors.textSecondary,
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                setState(() => _currentIndex = 1);
+                              },
+                              child: const Text(
+                                "View All →",
+                                style: TextStyle(color: AppColors.primary),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      SizedBox(
+                        height: 180,
+                        child: ListView.separated(
+                          scrollDirection: Axis.horizontal,
+                          padding: const EdgeInsets.symmetric(horizontal: 4),
+                          itemCount: searchResults.length > 5
+                              ? 5
+                              : searchResults.length,
+                          separatorBuilder: (c, i) => const SizedBox(width: 16),
+                          itemBuilder: (context, index) {
+                            final item = searchResults[index];
+                            return SpecialOfferCard(
+                              item: item,
+                              discount: "RESULT",
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
             const SizedBox(height: 32),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,

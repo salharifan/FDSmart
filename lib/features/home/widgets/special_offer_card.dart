@@ -3,6 +3,7 @@ import 'package:fdsmart/features/menu/models/menu_item_model.dart';
 import 'package:fdsmart/features/menu/views/menu_item_detail_screen.dart';
 import 'package:fdsmart/features/orders/viewmodels/order_view_model.dart';
 import 'package:fdsmart/features/orders/models/order_model.dart';
+import 'package:fdsmart/features/auth/viewmodels/auth_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -176,6 +177,38 @@ class SpecialOfferCard extends StatelessWidget {
                 ],
               ),
             ),
+            // Favorite button
+            Positioned(
+              top: 8,
+              left: 8,
+              child: Consumer<AuthViewModel>(
+                builder: (context, authViewModel, child) {
+                  final isFavorite =
+                      authViewModel.currentUser?.favorites.contains(item.id) ??
+                      false;
+                  return GestureDetector(
+                    onTap: () => authViewModel.toggleFavorite(item.id),
+                    child: Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        isFavorite
+                            ? Icons.favorite_rounded
+                            : Icons.favorite_border_rounded,
+                        size: 18,
+                        color: isFavorite
+                            ? Colors.red
+                            : AppColors.textSecondary,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+            // Discount badge
             Positioned(
               top: 0,
               right: 0,

@@ -27,7 +27,7 @@ void main() async {
       options: DefaultFirebaseOptions.currentPlatform,
     );
   } catch (e) {
-    print("Firebase init failed: $e");
+    debugPrint("Firebase init failed: $e");
   }
 
   runApp(const FDSmartApp());

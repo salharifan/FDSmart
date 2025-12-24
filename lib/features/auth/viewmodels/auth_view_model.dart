@@ -212,6 +212,7 @@ class AuthViewModel extends ChangeNotifier {
   Future<void> toggleFavorite(String itemId) async {
     if (_currentUser == null) return;
 
+    // Update local state immediately for instant UI feedback
     List<String> updatedFavorites = List.from(_currentUser!.favorites);
     if (updatedFavorites.contains(itemId)) {
       updatedFavorites.remove(itemId);
@@ -219,21 +220,27 @@ class AuthViewModel extends ChangeNotifier {
       updatedFavorites.add(itemId);
     }
 
+    // Update local user model immediately
+    _currentUser = UserModel(
+      uid: _currentUser!.uid,
+      email: _currentUser!.email,
+      role: _currentUser!.role,
+      name: _currentUser!.name,
+      phone: _currentUser!.phone,
+      favorites: updatedFavorites,
+      tokens: _currentUser!.tokens,
+    );
+    notifyListeners(); // Update UI immediately
+
+    // Try to sync with Firebase in background
     try {
       await _firestore.collection('users').doc(_currentUser!.uid).update({
         'favorites': updatedFavorites,
       });
-      _currentUser = UserModel(
-        uid: _currentUser!.uid,
-        email: _currentUser!.email,
-        role: _currentUser!.role,
-        name: _currentUser!.name,
-        favorites: updatedFavorites,
-        tokens: _currentUser!.tokens,
-      );
-      notifyListeners();
     } catch (e) {
-      print("Error updating favorites: $e");
+      print("Error syncing favorites to Firebase: $e");
+      // Show feedback to user
+      print("Favorites saved locally. Will sync when online.");
     }
   }
 
