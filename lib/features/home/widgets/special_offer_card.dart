@@ -65,30 +65,68 @@ class SpecialOfferCard extends StatelessWidget {
         );
       },
       child: Container(
-        width: 280,
-        margin: const EdgeInsets.only(right: 16),
+        width: 300,
+        margin: const EdgeInsets.only(right: 4),
         decoration: BoxDecoration(
-          color: AppColors.surfaceLight,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: const [
-            BoxShadow(
-              color: Colors.black12,
-              blurRadius: 10,
-              offset: Offset(0, 5),
-            ),
-          ],
+          gradient: LinearGradient(
+            colors: [
+              AppColors.surface,
+              AppColors.surfaceHighlight,
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: AppColors.divider.withOpacity(0.5),
+            width: 1,
+          ),
         ),
         child: Stack(
           children: [
             Padding(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(14),
               child: Row(
                 children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: _buildImage(),
+                  // Enhanced image with gradient overlay
+                  Stack(
+                    children: [
+                      Container(
+                        width: 110,
+                        height: 110,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.primary.withOpacity(0.2),
+                              blurRadius: 12,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(16),
+                          child: _buildImage(),
+                        ),
+                      ),
+                      Container(
+                        width: 110,
+                        height: 110,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(16),
+                          gradient: LinearGradient(
+                            colors: [
+                              Colors.transparent,
+                              Colors.black.withOpacity(0.3),
+                            ],
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: 14),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -98,40 +136,62 @@ class SpecialOfferCard extends StatelessWidget {
                           item.name,
                           style: const TextStyle(
                             color: AppColors.textPrimary,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 16,
+                            letterSpacing: 0.2,
+                            height: 1.3,
                           ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
-                        const SizedBox(height: 8),
-                        Text(
-                          "Rs. ${item.price.toInt()}",
-                          style: const TextStyle(
-                            color: AppColors.primary,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
+                        const SizedBox(height: 10),
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.currency_rupee_rounded,
+                              color: AppColors.accent,
+                              size: 16,
+                            ),
+                            Text(
+                              "${item.price.toInt()}",
+                              style: const TextStyle(
+                                color: AppColors.accent,
+                                fontWeight: FontWeight.w800,
+                                fontSize: 20,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 12),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Container(
                               padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 4,
+                                horizontal: 10,
+                                vertical: 6,
                               ),
                               decoration: BoxDecoration(
-                                color: AppColors.success.withOpacity(0.2),
+                                gradient: const LinearGradient(
+                                  colors: [Color(0xFF00C48C), Color(0xFF26DE81)],
+                                ),
                                 borderRadius: BorderRadius.circular(8),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: AppColors.success.withOpacity(0.3),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
                               ),
                               child: const Text(
                                 "SPECIAL",
                                 style: TextStyle(
-                                  color: AppColors.success,
+                                  color: Colors.white,
                                   fontSize: 10,
-                                  fontWeight: FontWeight.bold,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: 0.8,
                                 ),
                               ),
                             ),
@@ -149,21 +209,36 @@ class SpecialOfferCard extends StatelessWidget {
                                     );
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
-                                        content: Text("${item.name} added!"),
-                                        duration: const Duration(seconds: 1),
+                                        content: Row(
+                                          children: [
+                                            const Icon(Icons.check_circle_rounded, color: Colors.white),
+                                            const SizedBox(width: 8),
+                                            Text("${item.name} added to cart!"),
+                                          ],
+                                        ),
+                                        backgroundColor: AppColors.success,
+                                        duration: const Duration(seconds: 2),
+                                        behavior: SnackBarBehavior.floating,
                                       ),
                                     );
                                   },
                                   child: Container(
-                                    padding: const EdgeInsets.all(6),
-                                    decoration: const BoxDecoration(
-                                      color: AppColors.primary,
+                                    padding: const EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      gradient: AppColors.primaryGradient,
                                       shape: BoxShape.circle,
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: AppColors.primaryShadow,
+                                          blurRadius: 8,
+                                          offset: const Offset(0, 2),
+                                        ),
+                                      ],
                                     ),
                                     child: const Icon(
-                                      Icons.add,
+                                      Icons.add_rounded,
                                       color: Colors.white,
-                                      size: 18,
+                                      size: 20,
                                     ),
                                   ),
                                 );
@@ -177,10 +252,10 @@ class SpecialOfferCard extends StatelessWidget {
                 ],
               ),
             ),
-            // Favorite button
+            // Favorite button with modern design
             Positioned(
-              top: 8,
-              left: 8,
+              top: 10,
+              left: 10,
               child: Consumer<AuthViewModel>(
                 builder: (context, authViewModel, child) {
                   final isFavorite =
@@ -189,10 +264,25 @@ class SpecialOfferCard extends StatelessWidget {
                   return GestureDetector(
                     onTap: () => authViewModel.toggleFavorite(item.id),
                     child: Container(
-                      padding: const EdgeInsets.all(6),
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: isFavorite 
+                            ? Colors.red.withOpacity(0.15)
+                            : AppColors.background.withOpacity(0.7),
                         shape: BoxShape.circle,
+                        border: Border.all(
+                          color: isFavorite 
+                              ? Colors.red.withOpacity(0.5)
+                              : AppColors.divider.withOpacity(0.5),
+                          width: 1.5,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.2),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
                       ),
                       child: Icon(
                         isFavorite
@@ -201,35 +291,45 @@ class SpecialOfferCard extends StatelessWidget {
                         size: 18,
                         color: isFavorite
                             ? Colors.red
-                            : AppColors.textSecondary,
+                            : AppColors.textPrimary,
                       ),
                     ),
                   );
                 },
               ),
             ),
-            // Discount badge
+            // Discount badge with gradient
             Positioned(
               top: 0,
               right: 0,
               child: Container(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 6,
+                  horizontal: 12,
+                  vertical: 8,
                 ),
-                decoration: const BoxDecoration(
-                  color: AppColors.secondary,
-                  borderRadius: BorderRadius.only(
-                    topRight: Radius.circular(16),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFFFFA500), Color(0xFFFF8C00)],
+                  ),
+                  borderRadius: const BorderRadius.only(
+                    topRight: Radius.circular(20),
                     bottomLeft: Radius.circular(16),
                   ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.secondary.withOpacity(0.4),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
                 ),
                 child: Text(
                   discount,
                   style: const TextStyle(
-                    color: AppColors.textInverse,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 12,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w800,
+                    fontSize: 11,
+                    letterSpacing: 0.8,
                   ),
                 ),
               ),

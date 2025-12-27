@@ -42,12 +42,35 @@ class MenuViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  List<MenuItemModel> get foodItems => itemsWithFavorites(
-    _userFavorites,
-  ).where((i) => i.category == 'food').toList();
-  List<MenuItemModel> get drinkItems => itemsWithFavorites(
-    _userFavorites,
-  ).where((i) => i.category == 'drink').toList();
+  List<MenuItemModel> get foodItems {
+    // First filter by category, then apply search
+    List<MenuItemModel> categoryFiltered = _items.where((i) => i.category == 'food').toList();
+    return _applySearchFilter(categoryFiltered, _userFavorites);
+  }
+
+  List<MenuItemModel> get drinkItems {
+    // First filter by category, then apply search
+    List<MenuItemModel> categoryFiltered = _items.where((i) => i.category == 'drink').toList();
+    return _applySearchFilter(categoryFiltered, _userFavorites);
+  }
+
+  List<MenuItemModel> _applySearchFilter(List<MenuItemModel> items, List<String> favorites) {
+    List<MenuItemModel> results = items;
+    if (_searchQuery == "fav:only") {
+      results = items.where((i) => favorites.contains(i.id)).toList();
+    } else if (_searchQuery.isNotEmpty) {
+      final q = _searchQuery.toLowerCase();
+      results = items
+          .where(
+            (i) =>
+                i.name.toLowerCase().contains(q) ||
+                i.description.toLowerCase().contains(q) ||
+                i.tag.toLowerCase().contains(q),
+          )
+          .toList();
+    }
+    return results;
+  }
 
   List<MenuItemModel> get specialItems =>
       _items.where((i) => i.isSpecial).toList();
