@@ -17,7 +17,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  String _selectedRole = 'user'; // 'user' or 'admin'
 
   void _handleRegister() async {
     final authViewModel = Provider.of<AuthViewModel>(context, listen: false);
@@ -35,21 +34,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
       return;
     }
 
+    // SECURITY: Public signup always creates 'user' role
     bool success = await authViewModel.signUp(
       _emailController.text.trim(),
       _passwordController.text,
       _nameController.text.trim(),
       _phoneController.text.trim(),
-      _selectedRole,
+      'user', // Force user role for public signup
     );
 
     if (success) {
       if (mounted) {
-        if (_selectedRole == 'admin') {
-          Navigator.pushReplacementNamed(context, '/admin');
-        } else {
-          Navigator.pushReplacementNamed(context, '/home');
-        }
+        Navigator.pushReplacementNamed(context, '/home');
       }
     } else {
       if (mounted) {
@@ -205,42 +201,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         isPassword: true,
                       ),
                       const SizedBox(height: 28),
-                      
-                      // Role selection
-                      const Text(
-                        "Choose Account Type",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.textPrimary,
-                          letterSpacing: 0.2,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _buildRoleCard(
-                              title: "Customer",
-                              icon: Icons.person_rounded,
-                              role: "user",
-                              isSelected: _selectedRole == 'user',
-                              onTap: () => setState(() => _selectedRole = 'user'),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: _buildRoleCard(
-                              title: "Admin",
-                              icon: Icons.admin_panel_settings_rounded,
-                              role: "admin",
-                              isSelected: _selectedRole == 'admin',
-                              onTap: () => setState(() => _selectedRole = 'admin'),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 28),
 
                       // Sign up button
                       Consumer<AuthViewModel>(
@@ -304,80 +264,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ],
             ),
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildRoleCard({
-    required String title,
-    required IconData icon,
-    required String role,
-    required bool isSelected,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 250),
-        curve: Curves.easeInOut,
-        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
-        decoration: BoxDecoration(
-          gradient: isSelected
-              ? LinearGradient(
-                  colors: [
-                    AppColors.primary.withOpacity(0.15),
-                    AppColors.primaryLight.withOpacity(0.1),
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                )
-              : null,
-          color: isSelected ? null : AppColors.surfaceLight,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: isSelected 
-                ? AppColors.primary 
-                : AppColors.divider.withOpacity(0.5),
-            width: isSelected ? 2 : 1,
-          ),
-          boxShadow: isSelected
-              ? [
-                  BoxShadow(
-                    color: AppColors.primaryShadow,
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
-                  ),
-                ]
-              : null,
-        ),
-        child: Column(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: isSelected 
-                    ? AppColors.primary.withOpacity(0.15)
-                    : AppColors.backgroundElevated,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                icon,
-                color: isSelected ? AppColors.primary : AppColors.textSecondary,
-                size: 28,
-              ),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              title,
-              style: TextStyle(
-                fontWeight: FontWeight.w700,
-                fontSize: 13,
-                color: isSelected ? AppColors.primary : AppColors.textSecondary,
-                letterSpacing: 0.3,
-              ),
-            ),
-          ],
         ),
       ),
     );

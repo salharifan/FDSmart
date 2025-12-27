@@ -30,6 +30,17 @@ class MyReviewsScreen extends StatelessWidget {
                   ),
                   ElevatedButton.icon(
                     onPressed: () {
+                      // SECURITY: Admins don't have personal order history
+                      if (user?.role == 'admin') {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Admins do not have personal order history'),
+                            backgroundColor: AppColors.error,
+                          ),
+                        );
+                        return;
+                      }
+                      
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text(

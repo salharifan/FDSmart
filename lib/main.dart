@@ -61,8 +61,24 @@ class FDSmartApp extends StatelessWidget {
   }
 }
 
-class AuthWrapper extends StatelessWidget {
+class AuthWrapper extends StatefulWidget {
   const AuthWrapper({super.key});
+
+  @override
+  State<AuthWrapper> createState() => _AuthWrapperState();
+}
+
+class _AuthWrapperState extends State<AuthWrapper> {
+  @override
+  void initState() {
+    super.initState();
+    _validateUserOnLaunch();
+  }
+
+  Future<void> _validateUserOnLaunch() async {
+    // The auth state listener in AuthViewModel will handle validation
+    // This ensures deleted users are logged out on app launch
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -70,6 +86,22 @@ class AuthWrapper extends StatelessWidget {
 
     if (authViewModel.isLoading) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
+    // Show error message if user was deleted
+    if (authViewModel.errorMessage != null && 
+        authViewModel.errorMessage!.contains("Account not found")) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(authViewModel.errorMessage!),
+              backgroundColor: Colors.red,
+              duration: const Duration(seconds: 5),
+            ),
+          );
+        }
+      });
     }
 
     if (authViewModel.currentUser != null) {
