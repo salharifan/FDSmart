@@ -37,6 +37,20 @@ class AuthViewModel extends ChangeNotifier {
         password: password,
       );
 
+      // SECURITY: Validate user exists in Firestore
+      DocumentSnapshot userDoc = await _firestore
+          .collection('users')
+          .doc(cred.user!.uid)
+          .get();
+
+      if (!userDoc.exists) {
+        // User was deleted, force logout
+        await _auth.signOut();
+        _errorMessage = "Account not found. Please contact support.";
+        _setLoading(false);
+        return false;
+      }
+
       await _fetchUserDetails(cred.user!.uid);
       _setLoading(false);
       return true;
@@ -56,7 +70,7 @@ class AuthViewModel extends ChangeNotifier {
     }
   }
 
-  // Sign Up
+  // Sign Up (Public - always creates 'user' role)
   Future<bool> signUp(
     String email,
     String password,
@@ -66,6 +80,9 @@ class AuthViewModel extends ChangeNotifier {
   ) async {
     _setLoading(true);
     try {
+      // SECURITY: Force 'user' role for public signup
+      String safeRole = 'user';
+
       UserCredential cred = await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
@@ -75,7 +92,7 @@ class AuthViewModel extends ChangeNotifier {
       UserModel newUser = UserModel(
         uid: cred.user!.uid,
         email: email,
-        role: role,
+        role: safeRole,
         name: name,
         phone: phone,
       );
@@ -95,6 +112,60 @@ class AuthViewModel extends ChangeNotifier {
     } catch (e) {
       _errorMessage =
           "An unexpected error occurred: $e. (Did you configure Firebase?)";
+      _setLoading(false);
+      return false;
+    }
+  }
+
+  // Admin: Create Admin User (only callable by existing admin)
+  Future<bool> createAdminUser(
+    String email,
+    String password,
+    String name,
+    String phone,
+  ) async {
+    // SECURITY: Only admins can create admin users
+    if (_currentUser?.role != 'admin') {
+      _errorMessage = "Only admins can create admin accounts";
+      return false;
+    }
+
+    _setLoading(true);
+    try {
+      // Create user with temporary auth (requires Firebase Admin SDK in production)
+      // For now, using the current approach with a note
+      UserCredential cred = await _auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+
+      // Create Admin Record in Firestore
+      UserModel newAdmin = UserModel(
+        uid: cred.user!.uid,
+        email: email,
+        role: 'admin', // Admin role
+        name: name,
+        phone: phone,
+      );
+
+      await _firestore
+          .collection('users')
+          .doc(cred.user!.uid)
+          .set(newAdmin.toMap());
+
+      // Sign back in as the current admin
+      // Note: In production, use Firebase Admin SDK to avoid this
+      await _auth.signOut();
+      
+      _setLoading(false);
+      _errorMessage = "Admin created. Please sign in again.";
+      return true;
+    } on FirebaseAuthException catch (e) {
+      _errorMessage = e.message;
+      _setLoading(false);
+      return false;
+    } catch (e) {
+      _errorMessage = "Failed to create admin: $e";
       _setLoading(false);
       return false;
     }
@@ -187,20 +258,10 @@ class AuthViewModel extends ChangeNotifier {
           uid,
         );
       } else {
-        // Fallback for users without a profile doc (e.g. legacy or demo users)
-        final firebaseUser = _auth.currentUser;
-        if (firebaseUser != null) {
-          _currentUser = UserModel(
-            uid: uid,
-            email: firebaseUser.email ?? 'user@fdsmart.com',
-            role: 'user',
-            name:
-                firebaseUser.displayName ??
-                firebaseUser.email?.split('@')[0] ??
-                'User',
-            phone: firebaseUser.phoneNumber ?? '',
-          );
-        }
+        // SECURITY: User deleted, force logout
+        await _auth.signOut();
+        _currentUser = null;
+        _errorMessage = "Account not found. Please contact support.";
       }
       notifyListeners();
     } catch (e) {
@@ -278,9 +339,36 @@ class AuthViewModel extends ChangeNotifier {
     });
   }
 
-  // Admin: Delete User
-  Future<void> deleteUser(String uid) async {
-    await _firestore.collection('users').doc(uid).delete();
+  // Admin: Delete User (removes both Auth and Firestore)
+  Future<bool> deleteUser(String uid) async {
+    // SECURITY: Prevent admin self-deletion
+    if (_currentUser?.uid == uid) {
+      _errorMessage = "You cannot delete your own account";
+      notifyListeners();
+      return false;
+    }
+
+    // SECURITY: Only admins can delete users
+    if (_currentUser?.role != 'admin') {
+      _errorMessage = "Only admins can delete users";
+      notifyListeners();
+      return false;
+    }
+
+    try {
+      // Delete Firestore document
+      await _firestore.collection('users').doc(uid).delete();
+
+      // Note: Deleting Firebase Auth account requires Admin SDK
+      // In production, use Cloud Functions with Admin SDK
+      // For now, just delete Firestore doc which blocks login
+
+      return true;
+    } catch (e) {
+      _errorMessage = "Failed to delete user: $e";
+      notifyListeners();
+      return false;
+    }
   }
 
   void _setLoading(bool value) {

@@ -295,7 +295,6 @@ class AdminOrderView extends StatelessWidget {
                 itemBuilder: (context, index) {
                   final order = orders[index];
                   final statusColor = _getStatusColor(order.status);
-                  final statusIcon = _getStatusIcon(order.status);
 
                   return Container(
                     margin: const EdgeInsets.only(bottom: 16),
@@ -1311,111 +1310,6 @@ class AdminMenuView extends StatelessWidget {
     );
   }
 
-  void _confirmDeleteItem(
-    BuildContext context,
-    MenuViewModel model,
-    MenuItemModel item,
-  ) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: AppColors.surface,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
-          side: BorderSide(color: AppColors.divider, width: 1),
-        ),
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: AppColors.error.withOpacity(0.15),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(
-                Icons.delete_rounded,
-                color: AppColors.error,
-                size: 24,
-              ),
-            ),
-            const SizedBox(width: 12),
-            Text(
-              "Delete Item?",
-              style: TextStyle(
-                color: AppColors.textPrimary,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ],
-        ),
-        content: Text(
-          "Are you sure you want to delete '${item.name}'? This action cannot be undone.",
-          style: TextStyle(
-            color: AppColors.textSecondary,
-            fontSize: 14,
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            style: TextButton.styleFrom(
-              foregroundColor: AppColors.textSecondary,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-            ),
-            child: const Text("Cancel", style: TextStyle(fontWeight: FontWeight.w600)),
-          ),
-          Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [AppColors.error, AppColors.error.withOpacity(0.8)],
-              ),
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.error.withOpacity(0.3),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.transparent,
-                foregroundColor: Colors.white,
-                elevation: 0,
-                shadowColor: Colors.transparent,
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              ),
-              onPressed: () {
-                model.deleteMenuItem(item.id);
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Row(
-                      children: [
-                        Icon(Icons.check_circle_rounded, color: Colors.white),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Text(
-                            "Successfully deleted '${item.name}'",
-                            style: const TextStyle(fontWeight: FontWeight.w600),
-                          ),
-                        ),
-                      ],
-                    ),
-                    backgroundColor: AppColors.success,
-                    behavior: SnackBarBehavior.floating,
-                  ),
-                );
-              },
-              child: const Text("Delete", style: TextStyle(fontWeight: FontWeight.w600)),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   void _showItemDialog(
     BuildContext context,
     MenuViewModel model, {
@@ -1760,6 +1654,8 @@ class AdminUserView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var authViewModel = Provider.of<AuthViewModel>(context, listen: false);
+    final currentUserId = authViewModel.currentUser?.uid;
+
     return StreamBuilder<List<UserModel>>(
       stream: authViewModel.getAllUsersStream(),
       builder: (context, snapshot) {
@@ -1781,9 +1677,13 @@ class AdminUserView extends StatelessWidget {
           );
         }
 
-        final users = snapshot.data ?? [];
+        final allUsers = snapshot.data ?? [];
+        
+        // Separate admins and regular users
+        final admins = allUsers.where((u) => u.role.toLowerCase() == 'admin').toList();
+        final users = allUsers.where((u) => u.role.toLowerCase() != 'admin').toList();
 
-        if (users.isEmpty) {
+        if (allUsers.isEmpty) {
           return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -1853,39 +1753,318 @@ class AdminUserView extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        '${users.length} ${users.length == 1 ? 'user' : 'users'} registered',
+                        '${admins.length} admin(s) • ${users.length} user(s)',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                               color: AppColors.textSecondary,
                             ),
                       ),
                     ],
                   ),
+                  // Add Admin Button
                   Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     decoration: BoxDecoration(
-                      color: AppColors.info.withOpacity(0.15),
+                      gradient: AppColors.primaryGradient,
                       borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.primaryShadow,
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.transparent,
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        shadowColor: Colors.transparent,
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      ),
+                      onPressed: () => _showCreateAdminDialog(context, authViewModel),
+                      icon: const Icon(Icons.person_add_rounded, size: 20),
+                      label: const Text(
+                        'Add Admin',
+                        style: TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            // Users List with Sections
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.all(16),
+                children: [
+                  // Admin Section
+                  if (admins.isNotEmpty) ...[
+                    _buildSectionHeader(
+                      context,
+                      'Admin Accounts',
+                      admins.length,
+                      Icons.admin_panel_settings_rounded,
+                      AppColors.primary,
+                    ),
+                    const SizedBox(height: 12),
+                    ...admins.map((user) => _buildUserCard(
+                      context,
+                      authViewModel,
+                      user,
+                      currentUserId,
+                    )),
+                    const SizedBox(height: 24),
+                  ],
+                  // User Section
+                  if (users.isNotEmpty) ...[
+                    _buildSectionHeader(
+                      context,
+                      'User Accounts',
+                      users.length,
+                      Icons.people_rounded,
+                      AppColors.info,
+                    ),
+                    const SizedBox(height: 12),
+                    ...users.map((user) => _buildUserCard(
+                      context,
+                      authViewModel,
+                      user,
+                      currentUserId,
+                    )),
+                  ],
+                ],
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildSectionHeader(
+    BuildContext context,
+    String title,
+    int count,
+    IconData icon,
+    Color color,
+  ) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            color.withOpacity(0.15),
+            color.withOpacity(0.05),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: color.withOpacity(0.3),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: color, size: 20),
+          const SizedBox(width: 8),
+          Text(
+            title,
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  color: AppColors.textPrimary,
+                  fontWeight: FontWeight.w700,
+                ),
+          ),
+          const SizedBox(width: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              count.toString(),
+              style: TextStyle(
+                color: color,
+                fontWeight: FontWeight.bold,
+                fontSize: 12,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildUserCard(
+    BuildContext context,
+    AuthViewModel authViewModel,
+    UserModel user,
+    String? currentUserId,
+  ) {
+    final roleColor = _getRoleColor(user.role);
+    final roleIcon = _getRoleIcon(user.role);
+    final isSelf = user.uid == currentUserId;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: isSelf ? AppColors.primary.withOpacity(0.5) : AppColors.divider,
+          width: isSelf ? 2 : 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.cardShadow,
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: Column(
+          children: [
+            // User Header
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    AppColors.surfaceLight,
+                    AppColors.surface,
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+              ),
+              child: Row(
+                children: [
+                  // Avatar
+                  Container(
+                    width: 56,
+                    height: 56,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          roleColor.withOpacity(0.3),
+                          roleColor.withOpacity(0.15),
+                        ],
+                      ),
+                      shape: BoxShape.circle,
                       border: Border.all(
-                        color: AppColors.info.withOpacity(0.3),
+                        color: roleColor.withOpacity(0.5),
+                        width: 2,
+                      ),
+                    ),
+                    child: Icon(
+                      Icons.person_rounded,
+                      color: roleColor,
+                      size: 28,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  // User Info
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Flexible(
+                              child: Text(
+                                user.name ?? 'No Name',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleMedium
+                                    ?.copyWith(
+                                      color: AppColors.textPrimary,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                              ),
+                            ),
+                            if (isSelf) ...[
+                              const SizedBox(width: 8),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 2,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: AppColors.primary.withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(
+                                  'YOU',
+                                  style: TextStyle(
+                                    color: AppColors.primary,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 10,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                        const SizedBox(height: 4),
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.email_rounded,
+                              size: 14,
+                              color: AppColors.textSecondary,
+                            ),
+                            const SizedBox(width: 4),
+                            Expanded(
+                              child: Text(
+                                user.email,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall
+                                    ?.copyWith(
+                                      color: AppColors.textSecondary,
+                                    ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  // Role Badge
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: roleColor.withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                        color: roleColor.withOpacity(0.3),
                         width: 1,
                       ),
                     ),
                     child: Row(
                       children: [
                         Icon(
-                          Icons.people_rounded,
-                          color: AppColors.info,
-                          size: 20,
+                          roleIcon,
+                          size: 16,
+                          color: roleColor,
                         ),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: 6),
                         Text(
-                          users.length.toString(),
-                          style:
-                              Theme.of(context).textTheme.titleMedium?.copyWith(
-                                    color: AppColors.info,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                          user.role.toUpperCase(),
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: roleColor,
+                          ),
                         ),
                       ],
                     ),
@@ -1893,248 +2072,98 @@ class AdminUserView extends StatelessWidget {
                 ],
               ),
             ),
-            // Users List
-            Expanded(
-              child: ListView.builder(
-                padding: const EdgeInsets.all(16),
-                itemCount: users.length,
-                itemBuilder: (context, index) {
-                  final user = users[index];
-                  final roleColor = _getRoleColor(user.role);
-                  final roleIcon = _getRoleIcon(user.role);
-
-                  return Container(
-                    margin: const EdgeInsets.only(bottom: 16),
+            // User Actions
+            Container(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  // User ID Badge
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
-                      color: AppColors.surface,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: AppColors.divider,
-                        width: 1,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.cardShadow,
-                          blurRadius: 8,
-                          offset: const Offset(0, 2),
+                      color: AppColors.surfaceLight,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.fingerprint_rounded,
+                          size: 14,
+                          color: AppColors.textTertiary,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          'ID: ${user.uid.substring(0, 8)}...',
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.textTertiary,
+                          ),
                         ),
                       ],
                     ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(16),
-                      child: Column(
-                        children: [
-                          // User Header
-                          Container(
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: [
-                                  AppColors.surfaceLight,
-                                  AppColors.surface,
-                                ],
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                              ),
+                  ),
+                  const Spacer(),
+                  // View History Button (only for regular users, not admins)
+                  if (user.role.toLowerCase() != 'admin')
+                    Container(
+                      decoration: BoxDecoration(
+                        color: AppColors.info.withOpacity(0.15),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: IconButton(
+                        icon: Icon(
+                          Icons.history_rounded,
+                          color: AppColors.info,
+                          size: 20,
+                        ),
+                        onPressed: () {
+                          // Navigate to user's order history
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => OrderHistoryScreen(userId: user.uid),
                             ),
-                            child: Row(
-                              children: [
-                                // Avatar
-                                Container(
-                                  width: 56,
-                                  height: 56,
-                                  decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      colors: [
-                                        roleColor.withOpacity(0.3),
-                                        roleColor.withOpacity(0.15),
-                                      ],
-                                    ),
-                                    shape: BoxShape.circle,
-                                    border: Border.all(
-                                      color: roleColor.withOpacity(0.5),
-                                      width: 2,
-                                    ),
-                                  ),
-                                  child: Icon(
-                                    Icons.person_rounded,
-                                    color: roleColor,
-                                    size: 28,
-                                  ),
-                                ),
-                                const SizedBox(width: 16),
-                                // User Info
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        user.name ?? 'No Name',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleMedium
-                                            ?.copyWith(
-                                              color: AppColors.textPrimary,
-                                              fontWeight: FontWeight.w700,
-                                            ),
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Row(
-                                        children: [
-                                          Icon(
-                                            Icons.email_rounded,
-                                            size: 14,
-                                            color: AppColors.textSecondary,
-                                          ),
-                                          const SizedBox(width: 4),
-                                          Expanded(
-                                            child: Text(
-                                              user.email,
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .bodySmall
-                                                  ?.copyWith(
-                                                    color:
-                                                        AppColors.textSecondary,
-                                                  ),
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-                                // Role Badge
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 8,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: roleColor.withOpacity(0.15),
-                                    borderRadius: BorderRadius.circular(10),
-                                    border: Border.all(
-                                      color: roleColor.withOpacity(0.3),
-                                      width: 1,
-                                    ),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      Icon(
-                                        roleIcon,
-                                        size: 16,
-                                        color: roleColor,
-                                      ),
-                                      const SizedBox(width: 6),
-                                      Text(
-                                        user.role.toUpperCase(),
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.bold,
-                                          color: roleColor,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          // User Actions
-                          Container(
-                            padding: const EdgeInsets.all(16),
-                            child: Row(
-                              children: [
-                                // User ID Badge
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 6,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.surfaceLight,
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      Icon(
-                                        Icons.fingerprint_rounded,
-                                        size: 14,
-                                        color: AppColors.textTertiary,
-                                      ),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        'ID: ${user.uid.substring(0, 8)}...',
-                                        style: TextStyle(
-                                          fontSize: 11,
-                                          fontWeight: FontWeight.w500,
-                                          color: AppColors.textTertiary,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                const Spacer(),
-                                // View History Button
-                                Container(
-                                  decoration: BoxDecoration(
-                                    color: AppColors.info.withOpacity(0.15),
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  child: IconButton(
-                                    icon: Icon(
-                                      Icons.history_rounded,
-                                      color: AppColors.info,
-                                      size: 20,
-                                    ),
-                                    onPressed: () => Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (_) => OrderHistoryScreen(
-                                          userId: user.uid,
-                                        ),
-                                      ),
-                                    ),
-                                    tooltip: 'View Order History',
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                // Remove User Button
-                                Container(
-                                  decoration: BoxDecoration(
-                                    color: AppColors.error.withOpacity(0.15),
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  child: IconButton(
-                                    icon: Icon(
-                                      Icons.person_remove_rounded,
-                                      color: AppColors.error,
-                                      size: 20,
-                                    ),
-                                    onPressed: () => _confirmDeleteUser(
-                                      context,
-                                      authViewModel,
-                                      user,
-                                    ),
-                                    tooltip: 'Remove User',
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
+                          );
+                        },
+                        tooltip: 'View Order History',
                       ),
                     ),
-                  );
-                },
+                  if (user.role.toLowerCase() != 'admin')
+                    const SizedBox(width: 8),
+                  // Remove User Button (disabled for self)
+                  Container(
+                    decoration: BoxDecoration(
+                      color: isSelf
+                          ? AppColors.textTertiary.withOpacity(0.1)
+                          : AppColors.error.withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: IconButton(
+                      icon: Icon(
+                        Icons.person_remove_rounded,
+                        color: isSelf ? AppColors.textTertiary : AppColors.error,
+                        size: 20,
+                      ),
+                      onPressed: isSelf
+                          ? null // Disable for self
+                          : () => _confirmDeleteUser(
+                                context,
+                                authViewModel,
+                                user,
+                              ),
+                      tooltip: isSelf ? 'Cannot delete yourself' : 'Remove User',
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
-        );
-      },
+        ),
+      ),
     );
   }
 
@@ -2213,32 +2242,224 @@ class AdminUserView extends StatelessWidget {
                 shadowColor: Colors.transparent,
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               ),
-              onPressed: () {
-                auth.deleteUser(user.uid);
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Row(
-                      children: [
-                        Icon(Icons.check_circle_rounded, color: Colors.white),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Text(
-                            "User '${user.name}' has been removed",
-                            style: const TextStyle(fontWeight: FontWeight.w600),
+              onPressed: () async {
+                bool success = await auth.deleteUser(user.uid);
+                if (context.mounted) {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Row(
+                        children: [
+                          Icon(
+                            success ? Icons.check_circle_rounded : Icons.error_rounded,
+                            color: Colors.white,
                           ),
-                        ),
-                      ],
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              success
+                                  ? "User '${user.name}' has been removed"
+                                  : auth.errorMessage ?? "Failed to remove user",
+                              style: const TextStyle(fontWeight: FontWeight.w600),
+                            ),
+                          ),
+                        ],
+                      ),
+                      backgroundColor: success ? AppColors.success : AppColors.error,
+                      behavior: SnackBarBehavior.floating,
                     ),
-                    backgroundColor: AppColors.success,
-                    behavior: SnackBarBehavior.floating,
-                  ),
-                );
+                  );
+                }
               },
               child: const Text("Remove", style: TextStyle(fontWeight: FontWeight.w600)),
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  void _showCreateAdminDialog(BuildContext context, AuthViewModel auth) {
+    final nameController = TextEditingController();
+    final emailController = TextEditingController();
+    final phoneController = TextEditingController();
+    final passwordController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(24),
+          side: BorderSide(color: AppColors.divider, width: 1),
+        ),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                gradient: AppColors.primaryGradient,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Icon(
+                Icons.admin_panel_settings_rounded,
+                color: Colors.white,
+                size: 24,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Text(
+              "Create Admin Account",
+              style: TextStyle(
+                color: AppColors.textPrimary,
+                fontWeight: FontWeight.w700,
+                fontSize: 18,
+              ),
+            ),
+          ],
+        ),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildDialogTextField(
+                controller: nameController,
+                label: 'Full Name',
+                icon: Icons.person_rounded,
+              ),
+              const SizedBox(height: 12),
+              _buildDialogTextField(
+                controller: emailController,
+                label: 'Email Address',
+                icon: Icons.email_rounded,
+                keyboardType: TextInputType.emailAddress,
+              ),
+              const SizedBox(height: 12),
+              _buildDialogTextField(
+                controller: phoneController,
+                label: 'Phone Number',
+                icon: Icons.phone_rounded,
+                keyboardType: TextInputType.phone,
+              ),
+              const SizedBox(height: 12),
+              _buildDialogTextField(
+                controller: passwordController,
+                label: 'Password',
+                icon: Icons.lock_rounded,
+                isPassword: true,
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            style: TextButton.styleFrom(
+              foregroundColor: AppColors.textSecondary,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            ),
+            child: const Text("Cancel", style: TextStyle(fontWeight: FontWeight.w600)),
+          ),
+          Container(
+            decoration: BoxDecoration(
+              gradient: AppColors.primaryGradient,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.primaryShadow,
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.transparent,
+                foregroundColor: Colors.white,
+                elevation: 0,
+                shadowColor: Colors.transparent,
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              ),
+              onPressed: () async {
+                if (nameController.text.isEmpty ||
+                    emailController.text.isEmpty ||
+                    phoneController.text.isEmpty ||
+                    passwordController.text.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Please fill in all fields'),
+                      backgroundColor: AppColors.error,
+                    ),
+                  );
+                  return;
+                }
+
+                bool success = await auth.createAdminUser(
+                  emailController.text.trim(),
+                  passwordController.text,
+                  nameController.text.trim(),
+                  phoneController.text.trim(),
+                );
+
+                if (context.mounted) {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        success
+                            ? "Admin account created successfully!"
+                            : auth.errorMessage ?? "Failed to create admin",
+                        style: const TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                      backgroundColor: success ? AppColors.success : AppColors.error,
+                      behavior: SnackBarBehavior.floating,
+                    ),
+                  );
+                  
+                  if (success) {
+                    // Navigate back to login since admin creation logs out
+                    Navigator.pushReplacementNamed(context, '/login');
+                  }
+                }
+              },
+              child: const Text("Create Admin", style: TextStyle(fontWeight: FontWeight.w600)),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDialogTextField({
+    required TextEditingController controller,
+    required String label,
+    required IconData icon,
+    bool isPassword = false,
+    TextInputType? keyboardType,
+  }) {
+    return TextField(
+      controller: controller,
+      obscureText: isPassword,
+      keyboardType: keyboardType,
+      style: const TextStyle(color: AppColors.textPrimary),
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: const TextStyle(color: AppColors.textSecondary),
+        prefixIcon: Icon(icon, color: AppColors.primary),
+        filled: true,
+        fillColor: AppColors.surfaceLight,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: AppColors.divider),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: AppColors.divider),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: AppColors.primary, width: 2),
+        ),
       ),
     );
   }

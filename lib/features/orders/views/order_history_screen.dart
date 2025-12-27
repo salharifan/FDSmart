@@ -16,8 +16,32 @@ class OrderHistoryScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final authViewModel = Provider.of<AuthViewModel>(context, listen: false);
+    final currentUser = authViewModel.currentUser;
+    
+    // SECURITY: Block admin from viewing their OWN order history
+    // But allow admins to view OTHER users' order history (for management)
+    if (currentUser?.role == 'admin' && userId == null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (context.mounted) {
+          Navigator.of(context).pop();
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Admins do not have personal order history'),
+              backgroundColor: AppColors.error,
+            ),
+          );
+        }
+      });
+      return const Scaffold(
+        body: Center(
+          child: Text('Access Denied'),
+        ),
+      );
+    }
+
     final effectiveUserId =
-        userId ?? Provider.of<AuthViewModel>(context).currentUser?.uid;
+        userId ?? currentUser?.uid;
     final orderViewModel = Provider.of<OrderViewModel>(context, listen: false);
 
     return Scaffold(
