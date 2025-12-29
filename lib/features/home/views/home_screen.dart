@@ -27,7 +27,6 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
-  final TextEditingController _searchController = TextEditingController();
   StreamSubscription? _orderSubscription;
   final Set<String> _notifiedOrders = {};
 
@@ -42,7 +41,6 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void dispose() {
     _orderSubscription?.cancel();
-    _searchController.dispose();
     super.dispose();
   }
 
@@ -104,6 +102,29 @@ class _HomeScreenState extends State<HomeScreen> {
     return 'Good Evening,';
   }
 
+  Widget _buildNavIcon(IconData icon, int index, {bool active = false}) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        gradient: active ? AppColors.primaryGradient : null,
+        color: active ? null : Colors.transparent,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: active ? [
+          BoxShadow(
+            color: AppColors.primaryShadow,
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ] : null,
+      ),
+      child: Icon(
+        icon,
+        size: 24,
+        color: active ? Colors.white : AppColors.textTertiary,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<AuthViewModel>(context).currentUser;
@@ -139,62 +160,111 @@ class _HomeScreenState extends State<HomeScreen> {
           ).currentUser;
           if (orderModel.cartItems.isEmpty || user?.role == 'admin')
             return const SizedBox.shrink();
-          return FloatingActionButton.extended(
-            backgroundColor: AppColors.primary,
-            icon: const Icon(Icons.shopping_cart, color: Colors.white),
-            label: Text(
-              "${orderModel.cartItems.length} Items",
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
+          return Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              gradient: AppColors.primaryGradient,
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.primaryShadow,
+                  blurRadius: 20,
+                  spreadRadius: 2,
+                  offset: const Offset(0, 6),
+                ),
+              ],
             ),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const OrderPlacementScreen()),
-              );
-            },
+            child: FloatingActionButton.extended(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              icon: const Icon(Icons.shopping_cart_rounded, color: Colors.white, size: 22),
+              label: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                child: Row(
+                  children: [
+                    Text(
+                      "${orderModel.cartItems.length} Items",
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                        fontSize: 15,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.3),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.arrow_forward_rounded,
+                        color: Colors.white,
+                        size: 16,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const OrderPlacementScreen()),
+                );
+              },
+            ),
           );
         },
       ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: AppColors.surface,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.2),
-              blurRadius: 10,
-              offset: const Offset(0, -5),
-            ),
-          ],
+          border: const Border(
+            top: BorderSide(color: AppColors.divider, width: 1),
+          ),
         ),
-        child: BottomNavigationBar(
-          currentIndex: _currentIndex,
-          onTap: (index) => setState(() => _currentIndex = index),
-          type: BottomNavigationBarType.fixed,
-          backgroundColor: Colors.transparent,
-          selectedItemColor: AppColors.primary,
-          unselectedItemColor: AppColors.textSecondary,
-          elevation: 0,
-          items: [
-            BottomNavigationBarItem(
-              icon: const Icon(Icons.home_rounded),
-              label: langModel.translate('home'),
+        child: SafeArea(
+          child: BottomNavigationBar(
+            currentIndex: _currentIndex,
+            onTap: (index) => setState(() => _currentIndex = index),
+            type: BottomNavigationBarType.fixed,
+            backgroundColor: Colors.transparent,
+            selectedItemColor: AppColors.primary,
+            unselectedItemColor: AppColors.textTertiary,
+            selectedFontSize: 12,
+            unselectedFontSize: 11,
+            selectedLabelStyle: const TextStyle(
+              fontWeight: FontWeight.w700,
+              letterSpacing: 0.3,
             ),
-            BottomNavigationBarItem(
-              icon: const Icon(Icons.restaurant_menu_rounded),
-              label: langModel.translate('menu'),
+            unselectedLabelStyle: const TextStyle(
+              fontWeight: FontWeight.w500,
+              letterSpacing: 0.2,
             ),
-            BottomNavigationBarItem(
-              icon: const Icon(Icons.receipt_long_rounded),
-              label: langModel.translate('orders'),
-            ),
-            BottomNavigationBarItem(
-              icon: const Icon(Icons.person_rounded),
-              label: langModel.translate('profile'),
-            ),
-          ],
+            elevation: 0,
+            items: [
+              BottomNavigationBarItem(
+                icon: _buildNavIcon(Icons.home_outlined, 0),
+                activeIcon: _buildNavIcon(Icons.home_rounded, 0, active: true),
+                label: langModel.translate('home'),
+              ),
+              BottomNavigationBarItem(
+                icon: _buildNavIcon(Icons.restaurant_menu_outlined, 1),
+                activeIcon: _buildNavIcon(Icons.restaurant_menu_rounded, 1, active: true),
+                label: langModel.translate('menu'),
+              ),
+              BottomNavigationBarItem(
+                icon: _buildNavIcon(Icons.receipt_long_outlined, 2),
+                activeIcon: _buildNavIcon(Icons.receipt_long_rounded, 2, active: true),
+                label: langModel.translate('orders'),
+              ),
+              BottomNavigationBarItem(
+                icon: _buildNavIcon(Icons.person_outline_rounded, 3),
+                activeIcon: _buildNavIcon(Icons.person_rounded, 3, active: true),
+                label: langModel.translate('profile'),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -212,189 +282,91 @@ class _HomeScreenState extends State<HomeScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "${_getGreeting()} $userName!",
-                      style: const TextStyle(
-                        fontSize: 26,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
-                        letterSpacing: -0.5,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        _getGreeting(),
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.textSecondary,
+                          letterSpacing: 0.2,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 4),
-                    const Text(
-                      "What would you like to eat today?",
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: AppColors.textSecondary,
+                      const SizedBox(height: 4),
+                      Text(
+                        userName,
+                        style: const TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.textPrimary,
+                          letterSpacing: -0.5,
+                          height: 1.2,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                    ),
-                  ],
-                ),
-                IconButton(
-                  icon: const Icon(
-                    Icons.logout_rounded,
-                    size: 22,
-                    color: AppColors.error,
+                      const SizedBox(height: 6),
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: BoxDecoration(
+                              color: AppColors.accent.withOpacity(0.15),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.restaurant_rounded,
+                              color: AppColors.accent,
+                              size: 14,
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          const Flexible(
+                            child: Text(
+                              "What would you like to eat today?",
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: AppColors.textSecondary,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
-                  onPressed: () {
-                    Provider.of<AuthViewModel>(
-                      context,
-                      listen: false,
-                    ).signOut();
-                    Navigator.pushReplacementNamed(context, '/login');
-                  },
                 ),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const NotificationScreen(),
-                      ),
-                    );
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: const BoxDecoration(
-                      color: AppColors.surfaceLight,
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
+                const SizedBox(width: 12),
+                Container(
+                  decoration: BoxDecoration(
+                    color: AppColors.surfaceLight,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppColors.divider, width: 1),
+                  ),
+                  child: IconButton(
+                    icon: const Icon(
                       Icons.notifications_none_rounded,
+                      size: 22,
                       color: AppColors.textPrimary,
                     ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const NotificationScreen(),
+                        ),
+                      );
+                    },
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 24),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              height: 50,
-              decoration: BoxDecoration(
-                color: AppColors.surfaceLight,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: TextField(
-                controller: _searchController,
-                style: const TextStyle(color: AppColors.textPrimary),
-                decoration: InputDecoration(
-                  hintText: langModel.translate('search_hint'),
-                  hintStyle: const TextStyle(color: AppColors.textSecondary),
-                  prefixIcon: const Icon(
-                    Icons.search,
-                    color: AppColors.textSecondary,
-                  ),
-                  suffixIcon: _searchController.text.isNotEmpty
-                      ? IconButton(
-                          icon: const Icon(
-                            Icons.clear,
-                            color: AppColors.textSecondary,
-                          ),
-                          onPressed: () {
-                            _searchController.clear();
-                            Provider.of<MenuViewModel>(
-                              context,
-                              listen: false,
-                            ).setSearchQuery("");
-                          },
-                        )
-                      : null,
-                  border: InputBorder.none,
-                ),
-                onChanged: (val) {
-                  setState(() {}); // Update UI to show/hide clear button
-                  Provider.of<MenuViewModel>(
-                    context,
-                    listen: false,
-                  ).setSearchQuery(val);
-                },
-                onSubmitted: (val) {
-                  if (val.isNotEmpty) {
-                    // Navigate to Menu tab when user presses enter
-                    setState(() => _currentIndex = 1);
-                  }
-                },
-              ),
-            ),
-            // Show search results preview if searching
-            if (_searchController.text.isNotEmpty)
-              Consumer<MenuViewModel>(
-                builder: (context, menuModel, child) {
-                  final searchResults = menuModel.itemsWithFavorites(
-                    Provider.of<AuthViewModel>(
-                          context,
-                        ).currentUser?.favorites ??
-                        [],
-                  );
-                  if (searchResults.isEmpty) {
-                    return Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Text(
-                        "No items found for '${_searchController.text}'",
-                        style: const TextStyle(
-                          color: AppColors.textSecondary,
-                          fontSize: 14,
-                        ),
-                      ),
-                    );
-                  }
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 16),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 4),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              "Found ${searchResults.length} items",
-                              style: const TextStyle(
-                                fontSize: 14,
-                                color: AppColors.textSecondary,
-                              ),
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                setState(() => _currentIndex = 1);
-                              },
-                              child: const Text(
-                                "View All →",
-                                style: TextStyle(color: AppColors.primary),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      SizedBox(
-                        height: 180,
-                        child: ListView.separated(
-                          scrollDirection: Axis.horizontal,
-                          padding: const EdgeInsets.symmetric(horizontal: 4),
-                          itemCount: searchResults.length > 5
-                              ? 5
-                              : searchResults.length,
-                          separatorBuilder: (c, i) => const SizedBox(width: 16),
-                          itemBuilder: (context, index) {
-                            final item = searchResults[index];
-                            return SpecialOfferCard(
-                              item: item,
-                              discount: "RESULT",
-                            );
-                          },
-                        ),
-                      ),
-                    ],
-                  );
-                },
-              ),
-            const SizedBox(height: 32),
+            const SizedBox(height: 28),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [

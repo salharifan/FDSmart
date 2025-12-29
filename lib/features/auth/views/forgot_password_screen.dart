@@ -67,55 +67,137 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: Column(
-          children: [
-            const AppHeader(),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 40),
-                    const Text(
-                      "Reset Password",
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: BoxDecoration(
+          gradient: AppColors.darkGradient,
+        ),
+        child: SafeArea(
+          child: Column(
+            children: [
+              const AppHeader(),
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      const SizedBox(height: 20),
+                      
+                      // Icon with gradient background
+                      Container(
+                        padding: const EdgeInsets.all(24),
+                        decoration: BoxDecoration(
+                          gradient: AppColors.accentGradient,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.accent.withOpacity(0.3),
+                              blurRadius: 24,
+                              offset: const Offset(0, 8),
+                            ),
+                          ],
+                        ),
+                        child: const Icon(
+                          Icons.lock_reset_rounded,
+                          size: 56,
+                          color: AppColors.textInverse,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 8),
-                    const Text(
-                      "Enter your email address and we'll send you a link to reset your password.",
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: AppColors.textSecondary,
+                      const SizedBox(height: 32),
+                      
+                      const Text(
+                        "Forgot Password?",
+                        style: TextStyle(
+                          fontSize: 32,
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.textPrimary,
+                          letterSpacing: -0.5,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 40),
-                    CustomTextField(
-                      controller: _emailController,
-                      label: "Email Address",
-                      icon: Icons.email_outlined,
-                      keyboardType: TextInputType.emailAddress,
-                    ),
-                    const SizedBox(height: 40),
-                    Consumer<AuthViewModel>(
-                      builder: (context, model, child) {
-                        return CustomButton(
-                          text: "SEND RESET LINK",
-                          isLoading: model.isLoading,
-                          onPressed: _handleReset,
-                        );
-                      },
-                    ),
-                  ],
+                      const SizedBox(height: 12),
+                      const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 16),
+                        child: Text(
+                          "No worries! Enter your email address and we'll send you a link to reset your password.",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 15,
+                            color: AppColors.textSecondary,
+                            fontWeight: FontWeight.w500,
+                            height: 1.5,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 40),
+                      
+                      // Form card
+                      Container(
+                        padding: const EdgeInsets.all(28),
+                        decoration: BoxDecoration(
+                          color: AppColors.surface,
+                          borderRadius: BorderRadius.circular(24),
+                          border: Border.all(
+                            color: AppColors.divider.withOpacity(0.5),
+                            width: 1,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.cardShadow,
+                              blurRadius: 24,
+                              offset: const Offset(0, 8),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          children: [
+                            CustomTextField(
+                              controller: _emailController,
+                              label: "Email Address",
+                              icon: Icons.email_rounded,
+                              keyboardType: TextInputType.emailAddress,
+                            ),
+                            const SizedBox(height: 28),
+                            Consumer<AuthViewModel>(
+                              builder: (context, model, child) {
+                                return CustomButton(
+                                  text: "Send Reset Link",
+                                  icon: Icons.send_rounded,
+                                  isLoading: model.isLoading,
+                                  onPressed: _handleReset,
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                      
+                      const SizedBox(height: 24),
+                      
+                      // Back to login
+                      TextButton.icon(
+                        onPressed: () => Navigator.pop(context),
+                        icon: const Icon(
+                          Icons.arrow_back_rounded,
+                          size: 18,
+                          color: AppColors.accent,
+                        ),
+                        label: const Text(
+                          'Back to Login',
+                          style: TextStyle(
+                            color: AppColors.accent,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 15,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
