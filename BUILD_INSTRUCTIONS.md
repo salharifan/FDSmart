@@ -1,135 +1,158 @@
-# FDSmart - Build Instructions & Release Notes
+# FDSmart
+Build Instructions and Release Documentation
 
-## ✅ Issue Fixed: Architecture Mismatch
+### 1. Issue Identification and Resolution
+### 1.1 Problem Description
 
-### Problem
-The previous APK was built for x86_64 (emulator) architecture, but your phone uses ARM architecture. This caused the error:
-```
-Could not find 'libflutter.so'. Looked for:[arm64-v8a, armeabi-v7a, armeabi], but only found:[x86_64]
-```
+The initial release of the application was compiled for the x86_64 architecture, which is intended for Android emulators. Physical Android devices predominantly operate on ARM-based architectures. As a result, the application failed to execute on real devices and produced the following runtime error:
 
-### Solution
-Built a new release APK specifically targeting ARM architectures (arm64-v8a and armeabi-v7a) which are used by all modern Android phones.
+* ```Could not find 'libflutter.so'.```
+* ```Looked for: [arm64-v8a, armeabi-v7a, armeabi]```
+* ```Found only: [x86_64]```
 
----
+### 1.2 Root Cause
 
-## 📦 Release Files
+The error occurred due to an architecture mismatch between the generated APK and the target device hardware.
 
-### 1. **APK for Direct Installation** (Recommended for Testing)
-- **Location**: `build\app\outputs\flutter-apk\app-release.apk`
-- **Size**: 36.8 MB
-- **Architectures**: ARM64 (arm64-v8a) and ARM (armeabi-v7a)
-- **Use Case**: Direct installation on Android phones
-- **Installation**: Transfer to your phone and install directly
+### 1.3 Resolution
 
-### 2. **App Bundle for Play Store** (Recommended for Distribution)
-- **Location**: `build\app\outputs\bundle\release\app-release.aab`
-- **Size**: 47.6 MB
-- **Architectures**: All (automatically optimized by Play Store)
-- **Use Case**: Upload to Google Play Store
-- **Benefit**: Play Store delivers optimized APK for each device
+A new release build was generated targeting ARM-compatible architectures, specifically:
 
----
+* arm64-v8a
+* armeabi-v7a
 
-## 🚀 How to Install on Your Phone
+This ensures compatibility with both modern and legacy Android devices.
 
-### Method 1: Direct APK Installation
-1. Connect your phone to PC via USB
-2. Copy `build\app\outputs\flutter-apk\app-release.apk` to your phone
-3. On your phone, navigate to the APK file
-4. Tap to install (you may need to enable "Install from Unknown Sources")
-5. Launch the app
+### 2. Release Artifacts
+### 2.1 Release APK (Direct Installation)
 
-### Method 2: ADB Installation (Faster)
-```bash
-# Make sure your phone is connected via USB with USB debugging enabled
-adb install build\app\outputs\flutter-apk\app-release.apk
-```
+- File Path:
+```build/app/outputs/flutter-apk/app-release.apk```
 
----
+- File Size: ```36.8 MB```
 
-## 🔧 Build Commands Used
+- Target Architectures: ```ARM64 and ARM32```
 
-### Clean Build
-```bash
-flutter clean
-flutter pub get
-```
+- Purpose: Direct installation and functional testing on physical Android devices
 
-### Build APK for ARM Devices
-```bash
-flutter build apk --release --target-platform android-arm,android-arm64
-```
+### 2.2 Android App Bundle (AAB)
 
-### Build App Bundle (AAB)
-```bash
-flutter build appbundle --release
-```
+- File Path:
+```build/app/outputs/bundle/release/app-release.aab```
 
----
+- File Size: ```47.6 MB```
 
-## 📱 Supported Devices
+- Target Architectures: All supported architectures
 
-The new APK supports:
-- ✅ All modern Android phones (ARM64)
-- ✅ Older Android phones (ARM32)
-- ✅ Android version 5.0 (Lollipop) and above
+- Purpose: Deployment via Google Play Store
 
----
+Advantage: Google Play dynamically delivers optimized APKs for each device configuration
 
-## 🐛 Known Issues & Fixes
+### 3. Installation Procedures
+### 3.1 Manual APK Installation
 
-### Analysis Results
-The project has 41 minor linting issues (mostly deprecation warnings). These do NOT affect functionality:
-- Deprecated member usage warnings
-- Code style suggestions
+- Connect the Android device to a personal computer using a USB cable
 
-These are cosmetic and the app will work perfectly on your phone.
+- Transfer app-release.apk to the device storage
 
----
+- Locate the APK file using a file manager
 
-## 📋 App Features
+- Enable installation from unknown sources if prompted
 
-Your FDSmart app includes:
-- 🔐 Firebase Authentication (Login/Signup)
-- 🏠 Home Screen with product listings
-- 🛒 Order Management
-- 👤 User Profile & Settings
-- 📱 Notifications
-- ⭐ Reviews & Ratings
-- 👨‍💼 Admin Dashboard
-- 🎨 Modern Material Design UI
+- Complete the installation and launch the application
 
----
+### 3.2 Installation via Android Debug Bridge (ADB)
+- ```adb install``` build/app/outputs/flutter-apk/app-release.apk
 
-## 🎯 Next Steps
+- Note: USB Debugging must be enabled on the target device.
 
-1. **Install the APK** from `build\app\outputs\flutter-apk\app-release.apk`
-2. **Test all features** on your phone
-3. **For Play Store**: Use `build\app\outputs\bundle\release\app-release.aab`
+### 4. Build Environment and Commands
+### 4.1 Project Cleanup
+- ```flutter clean```
+- ```flutter pub get```
 
----
+### 4.2 APK Build for ARM Architectures
+- ```flutter build apk --release --target-platform android-arm,android-arm64```
 
-## 💡 Tips
+### 4.3 App Bundle Generation
+- ```flutter build appbundle --release```
 
-- **First Launch**: May take a few seconds to initialize
-- **Permissions**: Grant necessary permissions when prompted
-- **Internet**: Required for Firebase features
-- **Demo Mode**: Available if Firebase is not configured
+### 5. Device Compatibility
 
----
+- The release build supports:
 
-## 📞 Troubleshooting
+- ARM64-based Android devices
 
-If you still face issues:
-1. Uninstall any previous version of the app
-2. Clear app data/cache
-3. Restart your phone
-4. Reinstall the new APK
+- ARM32-based Android devices
 
----
+- Android operating system version 5.0 (Lollipop) and above
 
-**Build Date**: December 24, 2025, 11:55 PM IST
-**Version**: 1.0.0+1
-**Flutter Version**: Latest Stable
-**Target SDK**: Android 14+
+### 6. Code Quality Assessment
+
+Static analysis identified 41 minor lint warnings, primarily related to:
+
+- Deprecated API usage
+
+- Code style recommendations
+
+These issues do not impact application functionality and do not affect runtime behavior.
+
+### 7. Functional Scope of the Application
+
+The FDSmart application provides the following features:
+
+- Firebase-based authentication (user login and registration)
+
+- Home interface with dynamic product listings
+
+- Cart and order management system
+
+- Order tracking functionality
+
+- User profile and settings management
+
+- Notification handling
+
+- Review and rating system
+
+- Administrative dashboard
+
+- Modern Material Design–based user interface
+
+### 8. Recommended Next Steps
+
+- Install the release APK on a physical Android device
+
+- Perform end-to-end functional testing
+
+- Upload the App Bundle (.aab) to Google Play Store for production deployment
+
+### 9. Usage Notes
+
+- Initial application launch may take several seconds due to service initialization
+
+- An active internet connection is required for Firebase-dependent features
+
+- Users should grant requested permissions during first use
+
+### 10. Troubleshooting Guidelines
+
+If installation or runtime issues persist:
+
+- Uninstall any previously installed versions of the application
+
+- Clear application cache and data
+
+- Restart the Android device
+
+- Reinstall the latest release APK
+
+### 11. Build Metadata
+
+```Build Date: 24 December 2025, 11:55 PM (IST)```
+
+```Application Version: 1.0.0+1```
+
+```Flutter Channel: Stable```
+
+```Target SDK: Android 14```
