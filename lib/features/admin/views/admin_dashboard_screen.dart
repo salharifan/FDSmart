@@ -139,7 +139,7 @@ class AdminOrderView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var orderViewModel = Provider.of<OrderViewModel>(context, listen: false);
+    var orderViewModel = Provider.of<OrderViewModel>(context);
 
     return StreamBuilder<List<OrderModel>>(
       stream: orderViewModel.getAllActiveOrdersStream(),
@@ -2348,6 +2348,37 @@ class AdminUserView extends StatelessWidget {
                 icon: Icons.lock_rounded,
                 isPassword: true,
               ),
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppColors.warning.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: AppColors.warning.withOpacity(0.3),
+                    width: 1,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.info_outline_rounded,
+                      color: AppColors.warning,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Note: You will be logged out and need to sign in again after creating the admin.',
+                        style: TextStyle(
+                          color: AppColors.textSecondary,
+                          fontSize: 11,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
@@ -2403,22 +2434,52 @@ class AdminUserView extends StatelessWidget {
 
                 if (context.mounted) {
                   Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        success
-                            ? "Admin account created successfully!"
-                            : auth.errorMessage ?? "Failed to create admin",
-                        style: const TextStyle(fontWeight: FontWeight.w600),
-                      ),
-                      backgroundColor: success ? AppColors.success : AppColors.error,
-                      behavior: SnackBarBehavior.floating,
-                    ),
-                  );
                   
                   if (success) {
-                    // Navigate back to login since admin creation logs out
+                    // Show success message before navigating to login
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Row(
+                          children: [
+                            Icon(Icons.check_circle_rounded, color: Colors.white),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                "Admin account created successfully! Please log in again.",
+                                style: const TextStyle(fontWeight: FontWeight.w600),
+                              ),
+                            ),
+                          ],
+                        ),
+                        backgroundColor: AppColors.success,
+                        behavior: SnackBarBehavior.floating,
+                        duration: const Duration(seconds: 3),
+                      ),
+                    );
+                    
+                    // Navigate to login (admin was logged out by Firebase)
+                    await Future.delayed(const Duration(milliseconds: 500));
                     Navigator.pushReplacementNamed(context, '/login');
+                  } else {
+                    // Show error message
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Row(
+                          children: [
+                            Icon(Icons.error_rounded, color: Colors.white),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                auth.errorMessage ?? "Failed to create admin",
+                                style: const TextStyle(fontWeight: FontWeight.w600),
+                              ),
+                            ),
+                          ],
+                        ),
+                        backgroundColor: AppColors.error,
+                        behavior: SnackBarBehavior.floating,
+                      ),
+                    );
                   }
                 }
               },

@@ -118,6 +118,8 @@ class AuthViewModel extends ChangeNotifier {
   }
 
   // Admin: Create Admin User (only callable by existing admin)
+  // NOTE: Due to Firebase Client SDK limitation, the current admin will be logged out
+  // To avoid this, use Firebase Admin SDK via Cloud Functions in production
   Future<bool> createAdminUser(
     String email,
     String password,
@@ -131,42 +133,87 @@ class AuthViewModel extends ChangeNotifier {
     }
 
     _setLoading(true);
+    _errorMessage = null;
+    
     try {
-      // Create user with temporary auth (requires Firebase Admin SDK in production)
-      // For now, using the current approach with a note
+      // LIMITATION: Firebase client SDK createUserWithEmailAndPassword() automatically
+      // signs in as the newly created user, which logs out the current admin.
+      // This is unavoidable without Firebase Admin SDK (backend/Cloud Functions).
+      
       UserCredential cred = await _auth.createUserWithEmailAndPassword(
-        email: email,
+        email: email.trim(),
         password: password,
       );
 
-      // Create Admin Record in Firestore
-      UserModel newAdmin = UserModel(
-        uid: cred.user!.uid,
-        email: email,
-        role: 'admin', // Admin role
-        name: name,
-        phone: phone,
-      );
+      try {
+        // Create Admin Record in Firestore
+        UserModel newAdmin = UserModel(
+          uid: cred.user!.uid,
+          email: email.trim(),
+          role: 'admin', // Admin role
+          name: name.trim(),
+          phone: phone.trim(),
+        );
 
-      await _firestore
-          .collection('users')
-          .doc(cred.user!.uid)
-          .set(newAdmin.toMap());
+        await _firestore
+            .collection('users')
+            .doc(cred.user!.uid)
+            .set(newAdmin.toMap());
 
-      // Sign back in as the current admin
-      // Note: In production, use Firebase Admin SDK to avoid this
-      await _auth.signOut();
-      
-      _setLoading(false);
-      _errorMessage = "Admin created. Please sign in again.";
-      return true;
+        // Sign out the newly created admin user
+        // Current admin session is already lost (Firebase replaced it)
+        await _auth.signOut();
+        
+        _setLoading(false);
+        _errorMessage = null;
+        return true;
+      } catch (firestoreError) {
+        // If Firestore write fails, try to delete the auth user we just created
+        // and sign out (we're currently signed in as the new user)
+        try {
+          await cred.user?.delete();
+        } catch (deleteError) {
+          // If delete fails, just sign out - the orphaned auth account can't sign in without Firestore record
+        }
+        await _auth.signOut();
+        _errorMessage = "Failed to save admin data. Please try again.";
+        
+        // Don't use _setLoading(false) because it clears the error message
+        _isLoading = false;
+        notifyListeners();
+        
+        return false;
+      }
     } on FirebaseAuthException catch (e) {
-      _errorMessage = e.message;
-      _setLoading(false);
+      // Handle specific Firebase Auth errors with user-friendly messages
+      if (e.code == 'email-already-in-use') {
+        _errorMessage = "This email is already registered. Please use a different email address.";
+      } else if (e.code == 'weak-password') {
+        _errorMessage = "Password is too weak. Please use a stronger password (at least 6 characters).";
+      } else if (e.code == 'invalid-email') {
+        _errorMessage = "Invalid email address format. Please check and try again.";
+      } else if (e.code == 'operation-not-allowed') {
+        _errorMessage = "Email/password accounts are not enabled. Please contact support.";
+      } else {
+        _errorMessage = e.message ?? "Failed to create admin account. Error: ${e.code}";
+      }
+      
+      // Don't use _setLoading(false) because it clears the error message
+      _isLoading = false;
+      notifyListeners();
+      
+      // On error, Firebase Auth should not have changed the signed-in user
+      // But if it did (edge case), we can't recover without password
+      // The admin will need to sign in again if this happens
+      
       return false;
     } catch (e) {
-      _errorMessage = "Failed to create admin: $e";
-      _setLoading(false);
+      _errorMessage = "Failed to create admin account: ${e.toString()}";
+      
+      // Don't use _setLoading(false) because it clears the error message
+      _isLoading = false;
+      notifyListeners();
+      
       return false;
     }
   }

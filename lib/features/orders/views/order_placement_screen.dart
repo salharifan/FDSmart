@@ -2,6 +2,7 @@ import 'package:fdsmart/core/theme/app_colors.dart';
 import 'package:fdsmart/core/widgets/custom_button.dart';
 import 'package:fdsmart/features/auth/viewmodels/auth_view_model.dart';
 import 'package:fdsmart/features/orders/viewmodels/order_view_model.dart';
+import 'package:fdsmart/features/orders/views/order_history_screen.dart';
 import 'package:fdsmart/features/orders/models/order_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -411,12 +412,12 @@ class _OrderPlacementScreenState extends State<OrderPlacementScreen> {
                                                     child: CustomButton(
                                                       text: "TRACK ORDER",
                                                       onPressed: () {
-                                                        Navigator.pop(
-                                                          context,
-                                                        ); // Close dialog
-                                                        Navigator.pop(
-                                                          context,
-                                                        ); // Back to home
+                                                        Navigator.of(context).pop(); // close dialog
+                                                        Navigator.of(context).push(
+                                                          MaterialPageRoute(
+                                                            builder: (_) => const OrderHistoryScreen(),
+                                                          ),
+                                                        );
                                                       },
                                                     ),
                                                   ),
