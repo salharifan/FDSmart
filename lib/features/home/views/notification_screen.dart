@@ -10,8 +10,8 @@ class NotificationScreen extends StatelessWidget {
     // Mock notifications for now
     final notifications = [
       {
-        'title': 'Order Ready!',
-        'body': 'Your Token #104 is ready for pickup at the counter.',
+        'title': 'Order Completed!',
+        'body': 'Your Token #104 is available for pickup at the counter.',
         'time': '2 mins ago',
         'isNew': true,
       },

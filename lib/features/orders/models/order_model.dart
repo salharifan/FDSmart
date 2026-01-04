@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-enum OrderStatus { preparing, ready, completed, cancelled }
+enum OrderStatus { preparing, completed, cancelled }
 
 class OrderItemModel {
   final String menuItemId;
@@ -39,7 +39,7 @@ class OrderModel {
   final String userId;
   final List<OrderItemModel> items;
   final double totalPrice;
-  final String status; // 'preparing', 'ready', 'completed', 'cancelled'
+  final String status; // 'preparing', 'completed', 'cancelled'
   final int tokenNumber;
   final DateTime createdAt;
 
@@ -57,8 +57,6 @@ class OrderModel {
     switch (status) {
       case 'preparing':
         return OrderStatus.preparing;
-      case 'ready':
-        return OrderStatus.ready;
       case 'completed':
         return OrderStatus.completed;
       case 'cancelled':
@@ -89,7 +87,9 @@ class OrderModel {
         ),
       ),
       totalPrice: (map['totalPrice'] ?? 0).toDouble(),
-      status: map['status'] ?? 'preparing',
+      status: (map['status'] == 'ready')
+          ? 'completed'
+          : (map['status'] ?? 'preparing'),
       tokenNumber: map['tokenNumber'] ?? 0,
       createdAt: (map['createdAt'] as Timestamp).toDate(),
     );

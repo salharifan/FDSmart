@@ -18,7 +18,7 @@ class OrderHistoryScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final authViewModel = Provider.of<AuthViewModel>(context, listen: false);
     final currentUser = authViewModel.currentUser;
-    
+
     // SECURITY: Block admin from viewing their OWN order history
     // But allow admins to view OTHER users' order history (for management)
     if (currentUser?.role == 'admin' && userId == null) {
@@ -33,15 +33,10 @@ class OrderHistoryScreen extends StatelessWidget {
           );
         }
       });
-      return const Scaffold(
-        body: Center(
-          child: Text('Access Denied'),
-        ),
-      );
+      return const Scaffold(body: Center(child: Text('Access Denied')));
     }
 
-    final effectiveUserId =
-        userId ?? currentUser?.uid;
+    final effectiveUserId = userId ?? currentUser?.uid;
     final orderViewModel = Provider.of<OrderViewModel>(context, listen: false);
 
     return Scaffold(
@@ -141,9 +136,6 @@ class OrderHistoryScreen extends StatelessWidget {
     switch (order.statusEnum) {
       case OrderStatus.preparing:
         statusColor = Colors.orange;
-        break;
-      case OrderStatus.ready:
-        statusColor = Colors.green;
         break;
       case OrderStatus.completed:
         statusColor = Colors.grey;

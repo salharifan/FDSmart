@@ -55,8 +55,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ) {
         for (var order in orders) {
           final key = "${order.id}_${order.status}";
-          if ((order.status == 'ready' || order.status == 'completed') &&
-              !_notifiedOrders.contains(key)) {
+          if (order.status == 'completed' && !_notifiedOrders.contains(key)) {
             _notifiedOrders.add(key);
             _showNotification(order);
           }
@@ -81,9 +80,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ],
         ),
-        backgroundColor: order.status == 'ready'
-            ? AppColors.success
-            : AppColors.info,
+        backgroundColor: AppColors.success,
         behavior: SnackBarBehavior.floating,
         duration: const Duration(seconds: 4),
         action: SnackBarAction(
@@ -109,13 +106,15 @@ class _HomeScreenState extends State<HomeScreen> {
         gradient: active ? AppColors.primaryGradient : null,
         color: active ? null : Colors.transparent,
         borderRadius: BorderRadius.circular(12),
-        boxShadow: active ? [
-          BoxShadow(
-            color: AppColors.primaryShadow,
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ] : null,
+        boxShadow: active
+            ? [
+                BoxShadow(
+                  color: AppColors.primaryShadow,
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
+              ]
+            : null,
       ),
       child: Icon(
         icon,
@@ -176,7 +175,11 @@ class _HomeScreenState extends State<HomeScreen> {
             child: FloatingActionButton.extended(
               backgroundColor: Colors.transparent,
               elevation: 0,
-              icon: const Icon(Icons.shopping_cart_rounded, color: Colors.white, size: 22),
+              icon: const Icon(
+                Icons.shopping_cart_rounded,
+                color: Colors.white,
+                size: 22,
+              ),
               label: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 4),
                 child: Row(
@@ -209,7 +212,9 @@ class _HomeScreenState extends State<HomeScreen> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => const OrderPlacementScreen()),
+                  MaterialPageRoute(
+                    builder: (_) => const OrderPlacementScreen(),
+                  ),
                 );
               },
             ),
@@ -250,17 +255,29 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               BottomNavigationBarItem(
                 icon: _buildNavIcon(Icons.restaurant_menu_outlined, 1),
-                activeIcon: _buildNavIcon(Icons.restaurant_menu_rounded, 1, active: true),
+                activeIcon: _buildNavIcon(
+                  Icons.restaurant_menu_rounded,
+                  1,
+                  active: true,
+                ),
                 label: langModel.translate('menu'),
               ),
               BottomNavigationBarItem(
                 icon: _buildNavIcon(Icons.receipt_long_outlined, 2),
-                activeIcon: _buildNavIcon(Icons.receipt_long_rounded, 2, active: true),
+                activeIcon: _buildNavIcon(
+                  Icons.receipt_long_rounded,
+                  2,
+                  active: true,
+                ),
                 label: langModel.translate('orders'),
               ),
               BottomNavigationBarItem(
                 icon: _buildNavIcon(Icons.person_outline_rounded, 3),
-                activeIcon: _buildNavIcon(Icons.person_rounded, 3, active: true),
+                activeIcon: _buildNavIcon(
+                  Icons.person_rounded,
+                  3,
+                  active: true,
+                ),
                 label: langModel.translate('profile'),
               ),
             ],

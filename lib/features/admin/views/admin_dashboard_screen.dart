@@ -27,19 +27,14 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
       backgroundColor: AppColors.background,
       body: Column(
         children: [
-          SafeArea(
-            bottom: false,
-            child: const AppHeader(),
-          ),
+          SafeArea(bottom: false, child: const AppHeader()),
           Expanded(child: _buildBody()),
         ],
       ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: AppColors.surface,
-          border: Border(
-            top: BorderSide(color: AppColors.divider, width: 1),
-          ),
+          border: Border(top: BorderSide(color: AppColors.divider, width: 1)),
         ),
         child: SafeArea(
           child: BottomNavigationBar(
@@ -111,8 +106,6 @@ class AdminOrderView extends StatelessWidget {
     switch (status) {
       case 'preparing':
         return AppColors.warning;
-      case 'ready':
-        return AppColors.info;
       case 'completed':
         return AppColors.success;
       case 'cancelled':
@@ -126,8 +119,7 @@ class AdminOrderView extends StatelessWidget {
     switch (status) {
       case 'preparing':
         return Icons.restaurant_rounded;
-      case 'ready':
-        return Icons.shopping_bag_rounded;
+
       case 'completed':
         return Icons.check_circle_rounded;
       case 'cancelled':
@@ -154,8 +146,8 @@ class AdminOrderView extends StatelessWidget {
                 Text(
                   'Loading orders...',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: AppColors.textSecondary,
-                      ),
+                    color: AppColors.textSecondary,
+                  ),
                 ),
               ],
             ),
@@ -194,9 +186,9 @@ class AdminOrderView extends StatelessWidget {
                 Text(
                   onlyActive ? "No Active Orders" : "No Order History",
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        color: AppColors.textPrimary,
-                        fontWeight: FontWeight.w600,
-                      ),
+                    color: AppColors.textPrimary,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 Text(
@@ -204,8 +196,8 @@ class AdminOrderView extends StatelessWidget {
                       ? "All orders are completed or cancelled"
                       : "No completed or cancelled orders yet",
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: AppColors.textSecondary,
-                      ),
+                    color: AppColors.textSecondary,
+                  ),
                 ),
               ],
             ),
@@ -219,10 +211,7 @@ class AdminOrderView extends StatelessWidget {
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [
-                    AppColors.surface,
-                    AppColors.background,
-                  ],
+                  colors: [AppColors.surface, AppColors.background],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                 ),
@@ -239,22 +228,24 @@ class AdminOrderView extends StatelessWidget {
                       Text(
                         onlyActive ? 'Active Orders' : 'Order History',
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              color: AppColors.textPrimary,
-                              fontWeight: FontWeight.w700,
-                            ),
+                          color: AppColors.textPrimary,
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         '${orders.length} ${orders.length == 1 ? 'order' : 'orders'}',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: AppColors.textSecondary,
-                            ),
+                          color: AppColors.textSecondary,
+                        ),
                       ),
                     ],
                   ),
                   Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
                     decoration: BoxDecoration(
                       color: AppColors.primary.withOpacity(0.15),
                       borderRadius: BorderRadius.circular(12),
@@ -275,11 +266,11 @@ class AdminOrderView extends StatelessWidget {
                         const SizedBox(width: 8),
                         Text(
                           orders.length.toString(),
-                          style:
-                              Theme.of(context).textTheme.titleMedium?.copyWith(
-                                    color: AppColors.primary,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.bold,
+                              ),
                         ),
                       ],
                     ),
@@ -301,10 +292,7 @@ class AdminOrderView extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: AppColors.surface,
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: AppColors.divider,
-                        width: 1,
-                      ),
+                      border: Border.all(color: AppColors.divider, width: 1),
                       boxShadow: [
                         BoxShadow(
                           color: AppColors.cardShadow,
@@ -396,42 +384,46 @@ class AdminOrderView extends StatelessWidget {
                                       fontWeight: FontWeight.bold,
                                       fontSize: 13,
                                     ),
-                                    items: [
-                                      'preparing',
-                                      'ready',
-                                      'completed',
-                                      'cancelled',
-                                    ].map((String value) {
-                                      return DropdownMenuItem<String>(
-                                        value: value,
-                                        child: Row(
-                                          children: [
-                                            Icon(
-                                              _getStatusIcon(value),
-                                              size: 16,
-                                              color: _getStatusColor(value),
+                                    items:
+                                        [
+                                          'preparing',
+
+                                          'completed',
+                                          'cancelled',
+                                        ].map((String value) {
+                                          return DropdownMenuItem<String>(
+                                            value: value,
+                                            child: Row(
+                                              children: [
+                                                Icon(
+                                                  _getStatusIcon(value),
+                                                  size: 16,
+                                                  color: _getStatusColor(value),
+                                                ),
+                                                const SizedBox(width: 8),
+                                                Text(
+                                                  value.toUpperCase(),
+                                                  style: TextStyle(
+                                                    fontSize: 12,
+                                                    color: _getStatusColor(
+                                                      value,
+                                                    ),
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                ),
+                                              ],
                                             ),
-                                            const SizedBox(width: 8),
-                                            Text(
-                                              value.toUpperCase(),
-                                              style: TextStyle(
-                                                fontSize: 12,
-                                                color: _getStatusColor(value),
-                                                fontWeight: FontWeight.w600,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      );
-                                    }).toList(),
+                                          );
+                                        }).toList(),
                                     onChanged: (String? newValue) {
                                       if (newValue != null) {
                                         orderViewModel.updateOrderStatus(
                                           order.id,
                                           newValue,
                                         );
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
                                           SnackBar(
                                             content: Row(
                                               children: [
@@ -451,8 +443,9 @@ class AdminOrderView extends StatelessWidget {
                                                 ),
                                               ],
                                             ),
-                                            backgroundColor:
-                                                _getStatusColor(newValue),
+                                            backgroundColor: _getStatusColor(
+                                              newValue,
+                                            ),
                                             behavior: SnackBarBehavior.floating,
                                           ),
                                         );
@@ -492,8 +485,9 @@ class AdminOrderView extends StatelessWidget {
                                 const SizedBox(height: 12),
                                 ...order.items.map(
                                   (i) => Padding(
-                                    padding:
-                                        const EdgeInsets.symmetric(vertical: 4),
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 4,
+                                    ),
                                     child: Row(
                                       children: [
                                         Container(
@@ -502,8 +496,9 @@ class AdminOrderView extends StatelessWidget {
                                           decoration: BoxDecoration(
                                             color: AppColors.primary
                                                 .withOpacity(0.15),
-                                            borderRadius:
-                                                BorderRadius.circular(8),
+                                            borderRadius: BorderRadius.circular(
+                                              8,
+                                            ),
                                           ),
                                           child: Center(
                                             child: Text(
@@ -533,10 +528,7 @@ class AdminOrderView extends StatelessWidget {
                                   ),
                                 ),
                                 const SizedBox(height: 16),
-                                Container(
-                                  height: 1,
-                                  color: AppColors.divider,
-                                ),
+                                Container(height: 1, color: AppColors.divider),
                                 const SizedBox(height: 16),
                                 // Order Footer
                                 Row(
@@ -587,8 +579,9 @@ class AdminOrderView extends StatelessWidget {
                                         ),
                                         borderRadius: BorderRadius.circular(10),
                                         border: Border.all(
-                                          color:
-                                              AppColors.success.withOpacity(0.3),
+                                          color: AppColors.success.withOpacity(
+                                            0.3,
+                                          ),
                                           width: 1,
                                         ),
                                       ),
@@ -646,10 +639,7 @@ class AdminMenuView extends StatelessWidget {
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [
-                    AppColors.surface,
-                    AppColors.background,
-                  ],
+                  colors: [AppColors.surface, AppColors.background],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                 ),
@@ -666,16 +656,16 @@ class AdminMenuView extends StatelessWidget {
                       Text(
                         'Menu Management',
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              color: AppColors.textPrimary,
-                              fontWeight: FontWeight.w700,
-                            ),
+                          color: AppColors.textPrimary,
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         '${menuModel.items.length} ${menuModel.items.length == 1 ? 'item' : 'items'}',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: AppColors.textSecondary,
-                            ),
+                          color: AppColors.textSecondary,
+                        ),
                       ),
                     ],
                   ),
@@ -732,21 +722,17 @@ class AdminMenuView extends StatelessWidget {
                           const SizedBox(height: 24),
                           Text(
                             "No Menu Items",
-                            style:
-                                Theme.of(context).textTheme.titleLarge?.copyWith(
-                                      color: AppColors.textPrimary,
-                                      fontWeight: FontWeight.w600,
-                                    ),
+                            style: Theme.of(context).textTheme.titleLarge
+                                ?.copyWith(
+                                  color: AppColors.textPrimary,
+                                  fontWeight: FontWeight.w600,
+                                ),
                           ),
                           const SizedBox(height: 8),
                           Text(
                             "Start by adding your first menu item",
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium
-                                ?.copyWith(
-                                  color: AppColors.textSecondary,
-                                ),
+                            style: Theme.of(context).textTheme.bodyMedium
+                                ?.copyWith(color: AppColors.textSecondary),
                           ),
                         ],
                       ),
@@ -789,84 +775,116 @@ class AdminMenuView extends StatelessWidget {
                           ),
                           confirmDismiss: (direction) async {
                             return await showDialog<bool>(
-                              context: context,
-                              builder: (context) => AlertDialog(
-                                backgroundColor: AppColors.surface,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(24),
-                                  side: BorderSide(color: AppColors.divider, width: 1),
-                                ),
-                                title: Row(
-                                  children: [
-                                    Container(
-                                      padding: const EdgeInsets.all(10),
-                                      decoration: BoxDecoration(
-                                        color: AppColors.error.withOpacity(0.15),
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      child: Icon(
-                                        Icons.delete_rounded,
-                                        color: AppColors.error,
-                                        size: 24,
+                                  context: context,
+                                  builder: (context) => AlertDialog(
+                                    backgroundColor: AppColors.surface,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(24),
+                                      side: BorderSide(
+                                        color: AppColors.divider,
+                                        width: 1,
                                       ),
                                     ),
-                                    const SizedBox(width: 12),
-                                    Text(
-                                      "Delete Item?",
-                                      style: TextStyle(
-                                        color: AppColors.textPrimary,
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                content: Text(
-                                  "Are you sure you want to delete '${item.name}'? This action cannot be undone.",
-                                  style: TextStyle(
-                                    color: AppColors.textSecondary,
-                                    fontSize: 14,
-                                  ),
-                                ),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () => Navigator.pop(context, false),
-                                    style: TextButton.styleFrom(
-                                      foregroundColor: AppColors.textSecondary,
-                                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                                    ),
-                                    child: const Text("Cancel", style: TextStyle(fontWeight: FontWeight.w600)),
-                                  ),
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      gradient: LinearGradient(
-                                        colors: [AppColors.error, AppColors.error.withOpacity(0.8)],
-                                      ),
-                                      borderRadius: BorderRadius.circular(12),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: AppColors.error.withOpacity(0.3),
-                                          blurRadius: 8,
-                                          offset: const Offset(0, 2),
+                                    title: Row(
+                                      children: [
+                                        Container(
+                                          padding: const EdgeInsets.all(10),
+                                          decoration: BoxDecoration(
+                                            color: AppColors.error.withOpacity(
+                                              0.15,
+                                            ),
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
+                                          ),
+                                          child: Icon(
+                                            Icons.delete_rounded,
+                                            color: AppColors.error,
+                                            size: 24,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Text(
+                                          "Delete Item?",
+                                          style: TextStyle(
+                                            color: AppColors.textPrimary,
+                                            fontWeight: FontWeight.w700,
+                                          ),
                                         ),
                                       ],
                                     ),
-                                    child: ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.transparent,
-                                        foregroundColor: Colors.white,
-                                        elevation: 0,
-                                        shadowColor: Colors.transparent,
-                                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                                    content: Text(
+                                      "Are you sure you want to delete '${item.name}'? This action cannot be undone.",
+                                      style: TextStyle(
+                                        color: AppColors.textSecondary,
+                                        fontSize: 14,
                                       ),
-                                      onPressed: () {
-                                        Navigator.pop(context, true);
-                                      },
-                                      child: const Text("Delete", style: TextStyle(fontWeight: FontWeight.w600)),
                                     ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () =>
+                                            Navigator.pop(context, false),
+                                        style: TextButton.styleFrom(
+                                          foregroundColor:
+                                              AppColors.textSecondary,
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 20,
+                                            vertical: 12,
+                                          ),
+                                        ),
+                                        child: const Text(
+                                          "Cancel",
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ),
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          gradient: LinearGradient(
+                                            colors: [
+                                              AppColors.error,
+                                              AppColors.error.withOpacity(0.8),
+                                            ],
+                                          ),
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: AppColors.error
+                                                  .withOpacity(0.3),
+                                              blurRadius: 8,
+                                              offset: const Offset(0, 2),
+                                            ),
+                                          ],
+                                        ),
+                                        child: ElevatedButton(
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: Colors.transparent,
+                                            foregroundColor: Colors.white,
+                                            elevation: 0,
+                                            shadowColor: Colors.transparent,
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 20,
+                                              vertical: 12,
+                                            ),
+                                          ),
+                                          onPressed: () {
+                                            Navigator.pop(context, true);
+                                          },
+                                          child: const Text(
+                                            "Delete",
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ],
-                              ),
-                            ) ?? false;
+                                ) ??
+                                false;
                           },
                           onDismissed: (direction) {
                             menuModel.deleteMenuItem(item.id);
@@ -874,12 +892,17 @@ class AdminMenuView extends StatelessWidget {
                               SnackBar(
                                 content: Row(
                                   children: [
-                                    Icon(Icons.check_circle_rounded, color: Colors.white),
+                                    Icon(
+                                      Icons.check_circle_rounded,
+                                      color: Colors.white,
+                                    ),
                                     const SizedBox(width: 12),
                                     Expanded(
                                       child: Text(
                                         "Successfully deleted '${item.name}'",
-                                        style: const TextStyle(fontWeight: FontWeight.w600),
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -907,370 +930,404 @@ class AdminMenuView extends StatelessWidget {
                               ],
                             ),
                             child: ClipRRect(
-                            borderRadius: BorderRadius.circular(16),
-                            child: Column(
-                              children: [
-                                // Item Header
-                                Container(
-                                  padding: const EdgeInsets.all(16),
-                                  decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      colors: [
-                                        AppColors.surfaceLight,
-                                        AppColors.surface,
-                                      ],
-                                      begin: Alignment.topLeft,
-                                      end: Alignment.bottomRight,
+                              borderRadius: BorderRadius.circular(16),
+                              child: Column(
+                                children: [
+                                  // Item Header
+                                  Container(
+                                    padding: const EdgeInsets.all(16),
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        colors: [
+                                          AppColors.surfaceLight,
+                                          AppColors.surface,
+                                        ],
+                                        begin: Alignment.topLeft,
+                                        end: Alignment.bottomRight,
+                                      ),
                                     ),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      // Item Image
-                                      Container(
-                                        width: 72,
-                                        height: 72,
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(12),
-                                          border: Border.all(
-                                            color: AppColors.divider,
-                                            width: 2,
+                                    child: Row(
+                                      children: [
+                                        // Item Image
+                                        Container(
+                                          width: 72,
+                                          height: 72,
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
+                                            border: Border.all(
+                                              color: AppColors.divider,
+                                              width: 2,
+                                            ),
+                                          ),
+                                          child: ClipRRect(
+                                            borderRadius: BorderRadius.circular(
+                                              10,
+                                            ),
+                                            child: _buildImage(item.imageUrl),
                                           ),
                                         ),
-                                        child: ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          child: _buildImage(item.imageUrl),
-                                        ),
-                                      ),
-                                      const SizedBox(width: 16),
-                                      // Item Details
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Row(
-                                              children: [
-                                                Expanded(
-                                                  child: Text(
-                                                    item.name,
-                                                    style: Theme.of(context)
-                                                        .textTheme
-                                                        .titleMedium
-                                                        ?.copyWith(
-                                                          color: AppColors
-                                                              .textPrimary,
-                                                          fontWeight:
-                                                              FontWeight.w700,
-                                                        ),
-                                                  ),
-                                                ),
-                                                if (item.isSpecial)
-                                                  Container(
-                                                    margin:
-                                                        const EdgeInsets.only(
-                                                            left: 8),
-                                                    padding: const EdgeInsets
-                                                        .symmetric(
-                                                      horizontal: 8,
-                                                      vertical: 4,
+                                        const SizedBox(width: 16),
+                                        // Item Details
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  Expanded(
+                                                    child: Text(
+                                                      item.name,
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .titleMedium
+                                                          ?.copyWith(
+                                                            color: AppColors
+                                                                .textPrimary,
+                                                            fontWeight:
+                                                                FontWeight.w700,
+                                                          ),
                                                     ),
-                                                    decoration: BoxDecoration(
-                                                      color: AppColors.secondary
-                                                          .withOpacity(0.15),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              6),
-                                                      border: Border.all(
+                                                  ),
+                                                  if (item.isSpecial)
+                                                    Container(
+                                                      margin:
+                                                          const EdgeInsets.only(
+                                                            left: 8,
+                                                          ),
+                                                      padding:
+                                                          const EdgeInsets.symmetric(
+                                                            horizontal: 8,
+                                                            vertical: 4,
+                                                          ),
+                                                      decoration: BoxDecoration(
                                                         color: AppColors
                                                             .secondary
+                                                            .withOpacity(0.15),
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                              6,
+                                                            ),
+                                                        border: Border.all(
+                                                          color: AppColors
+                                                              .secondary
+                                                              .withOpacity(0.3),
+                                                          width: 1,
+                                                        ),
+                                                      ),
+                                                      child: Row(
+                                                        children: [
+                                                          Icon(
+                                                            Icons.star_rounded,
+                                                            size: 12,
+                                                            color: AppColors
+                                                                .secondary,
+                                                          ),
+                                                          const SizedBox(
+                                                            width: 2,
+                                                          ),
+                                                          Text(
+                                                            'Special',
+                                                            style: TextStyle(
+                                                              fontSize: 10,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w600,
+                                                              color: AppColors
+                                                                  .secondary,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                ],
+                                              ),
+                                              const SizedBox(height: 6),
+                                              Row(
+                                                children: [
+                                                  Container(
+                                                    padding:
+                                                        const EdgeInsets.symmetric(
+                                                          horizontal: 10,
+                                                          vertical: 4,
+                                                        ),
+                                                    decoration: BoxDecoration(
+                                                      gradient: LinearGradient(
+                                                        colors: [
+                                                          AppColors.success
+                                                              .withOpacity(0.2),
+                                                          AppColors.success
+                                                              .withOpacity(0.1),
+                                                        ],
+                                                      ),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            8,
+                                                          ),
+                                                      border: Border.all(
+                                                        color: AppColors.success
                                                             .withOpacity(0.3),
                                                         width: 1,
                                                       ),
                                                     ),
                                                     child: Row(
                                                       children: [
+                                                        const Text(
+                                                          'Rs. ',
+                                                          style: TextStyle(
+                                                            fontSize: 11,
+                                                            color: AppColors
+                                                                .success,
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                          ),
+                                                        ),
+                                                        Text(
+                                                          item.price.toString(),
+                                                          style:
+                                                              const TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                fontSize: 15,
+                                                                color: AppColors
+                                                                    .success,
+                                                              ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  const SizedBox(width: 8),
+                                                  Container(
+                                                    padding:
+                                                        const EdgeInsets.symmetric(
+                                                          horizontal: 8,
+                                                          vertical: 4,
+                                                        ),
+                                                    decoration: BoxDecoration(
+                                                      color: AppColors.info
+                                                          .withOpacity(0.15),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            8,
+                                                          ),
+                                                    ),
+                                                    child: Row(
+                                                      children: [
                                                         Icon(
                                                           Icons.star_rounded,
                                                           size: 12,
-                                                          color: AppColors
-                                                              .secondary,
+                                                          color: AppColors.info,
                                                         ),
-                                                        const SizedBox(width: 2),
+                                                        const SizedBox(
+                                                          width: 2,
+                                                        ),
                                                         Text(
-                                                          'Special',
+                                                          item.rating
+                                                              .toString(),
                                                           style: TextStyle(
-                                                            fontSize: 10,
+                                                            fontSize: 11,
                                                             fontWeight:
                                                                 FontWeight.w600,
-                                                            color: AppColors
-                                                                .secondary,
+                                                            color:
+                                                                AppColors.info,
                                                           ),
                                                         ),
                                                       ],
                                                     ),
                                                   ),
-                                              ],
-                                            ),
-                                            const SizedBox(height: 6),
-                                            Row(
-                                              children: [
-                                                Container(
-                                                  padding: const EdgeInsets
-                                                      .symmetric(
-                                                    horizontal: 10,
-                                                    vertical: 4,
-                                                  ),
-                                                  decoration: BoxDecoration(
-                                                    gradient: LinearGradient(
-                                                      colors: [
-                                                        AppColors.success
-                                                            .withOpacity(0.2),
-                                                        AppColors.success
-                                                            .withOpacity(0.1),
-                                                      ],
-                                                    ),
-                                                    borderRadius:
-                                                        BorderRadius.circular(8),
-                                                    border: Border.all(
-                                                      color: AppColors.success
-                                                          .withOpacity(0.3),
-                                                      width: 1,
-                                                    ),
-                                                  ),
-                                                  child: Row(
-                                                    children: [
-                                                      const Text(
-                                                        'Rs. ',
-                                                        style: TextStyle(
-                                                          fontSize: 11,
-                                                          color:
-                                                              AppColors.success,
-                                                          fontWeight:
-                                                              FontWeight.w500,
-                                                        ),
-                                                      ),
-                                                      Text(
-                                                        item.price.toString(),
-                                                        style: const TextStyle(
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          fontSize: 15,
-                                                          color:
-                                                              AppColors.success,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                                const SizedBox(width: 8),
-                                                Container(
-                                                  padding: const EdgeInsets
-                                                      .symmetric(
-                                                    horizontal: 8,
-                                                    vertical: 4,
-                                                  ),
-                                                  decoration: BoxDecoration(
-                                                    color: AppColors.info
-                                                        .withOpacity(0.15),
-                                                    borderRadius:
-                                                        BorderRadius.circular(8),
-                                                  ),
-                                                  child: Row(
-                                                    children: [
-                                                      Icon(
-                                                        Icons.star_rounded,
-                                                        size: 12,
-                                                        color: AppColors.info,
-                                                      ),
-                                                      const SizedBox(width: 2),
-                                                      Text(
-                                                        item.rating.toString(),
-                                                        style: TextStyle(
-                                                          fontSize: 11,
-                                                          fontWeight:
-                                                              FontWeight.w600,
-                                                          color: AppColors.info,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ],
+                                                ],
+                                              ),
+                                            ],
+                                          ),
                                         ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
-                                ),
-                                // Item Actions
-                                Container(
-                                  padding: const EdgeInsets.all(16),
-                                  child: Row(
-                                    children: [
-                                      // Category Tag
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 12,
-                                          vertical: 6,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: item.category == 'food'
-                                              ? AppColors.foodYellow
-                                                  .withOpacity(0.15)
-                                              : AppColors.info.withOpacity(0.15),
-                                          borderRadius:
-                                              BorderRadius.circular(8),
-                                        ),
-                                        child: Row(
-                                          children: [
-                                            Icon(
-                                              item.category == 'food'
-                                                  ? Icons.restaurant_rounded
-                                                  : Icons.local_cafe_rounded,
-                                              size: 14,
-                                              color: item.category == 'food'
-                                                  ? AppColors.foodYellow
-                                                  : AppColors.info,
+                                  // Item Actions
+                                  Container(
+                                    padding: const EdgeInsets.all(16),
+                                    child: Row(
+                                      children: [
+                                        // Category Tag
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 12,
+                                            vertical: 6,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: item.category == 'food'
+                                                ? AppColors.foodYellow
+                                                      .withOpacity(0.15)
+                                                : AppColors.info.withOpacity(
+                                                    0.15,
+                                                  ),
+                                            borderRadius: BorderRadius.circular(
+                                              8,
                                             ),
-                                            const SizedBox(width: 4),
-                                            Text(
-                                              item.category.toUpperCase(),
-                                              style: TextStyle(
-                                                fontSize: 11,
-                                                fontWeight: FontWeight.w600,
+                                          ),
+                                          child: Row(
+                                            children: [
+                                              Icon(
+                                                item.category == 'food'
+                                                    ? Icons.restaurant_rounded
+                                                    : Icons.local_cafe_rounded,
+                                                size: 14,
                                                 color: item.category == 'food'
                                                     ? AppColors.foodYellow
                                                     : AppColors.info,
                                               ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      const Spacer(),
-                                      // Availability Toggle
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 8,
-                                          vertical: 4,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: item.isAvailable
-                                              ? AppColors.success
-                                                  .withOpacity(0.15)
-                                              : AppColors.error.withOpacity(0.15),
-                                          borderRadius:
-                                              BorderRadius.circular(8),
-                                        ),
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Icon(
-                                              item.isAvailable
-                                                  ? Icons.check_circle_rounded
-                                                  : Icons.cancel_rounded,
-                                              size: 14,
-                                              color: item.isAvailable
-                                                  ? AppColors.success
-                                                  : AppColors.error,
-                                            ),
-                                            const SizedBox(width: 4),
-                                            Flexible(
-                                              child: Text(
-                                                item.isAvailable
-                                                    ? 'Available'
-                                                    : 'Unavailable',
+                                              const SizedBox(width: 4),
+                                              Text(
+                                                item.category.toUpperCase(),
                                                 style: TextStyle(
                                                   fontSize: 11,
                                                   fontWeight: FontWeight.w600,
-                                                  color: item.isAvailable
-                                                      ? AppColors.success
-                                                      : AppColors.error,
+                                                  color: item.category == 'food'
+                                                      ? AppColors.foodYellow
+                                                      : AppColors.info,
                                                 ),
-                                                overflow: TextOverflow.ellipsis,
                                               ),
+                                            ],
+                                          ),
+                                        ),
+                                        const Spacer(),
+                                        // Availability Toggle
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 8,
+                                            vertical: 4,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: item.isAvailable
+                                                ? AppColors.success.withOpacity(
+                                                    0.15,
+                                                  )
+                                                : AppColors.error.withOpacity(
+                                                    0.15,
+                                                  ),
+                                            borderRadius: BorderRadius.circular(
+                                              8,
                                             ),
-                                            const SizedBox(width: 4),
-                                            Switch(
-                                              value: item.isAvailable,
-                                              activeColor: AppColors.success,
-                                              inactiveTrackColor: AppColors.error
-                                                  .withOpacity(0.3),
-                                              materialTapTargetSize:
-                                                  MaterialTapTargetSize
-                                                      .shrinkWrap,
-                                              onChanged: (val) {
-                                                menuModel.toggleAvailability(
-                                                    item.id, val);
-                                                ScaffoldMessenger.of(context)
-                                                    .showSnackBar(
-                                                  SnackBar(
-                                                    content: Row(
-                                                      children: [
-                                                        Icon(
-                                                          val
-                                                              ? Icons
-                                                                  .check_circle_rounded
-                                                              : Icons
-                                                                  .cancel_rounded,
-                                                          color: Colors.white,
-                                                        ),
-                                                        const SizedBox(
-                                                            width: 12),
-                                                        Expanded(
-                                                          child: Text(
-                                                            "${item.name} is now ${val ? 'Available' : 'Unavailable'}",
-                                                            style:
-                                                                const TextStyle(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w600,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    backgroundColor: val
+                                          ),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Icon(
+                                                item.isAvailable
+                                                    ? Icons.check_circle_rounded
+                                                    : Icons.cancel_rounded,
+                                                size: 14,
+                                                color: item.isAvailable
+                                                    ? AppColors.success
+                                                    : AppColors.error,
+                                              ),
+                                              const SizedBox(width: 4),
+                                              Flexible(
+                                                child: Text(
+                                                  item.isAvailable
+                                                      ? 'Available'
+                                                      : 'Unavailable',
+                                                  style: TextStyle(
+                                                    fontSize: 11,
+                                                    fontWeight: FontWeight.w600,
+                                                    color: item.isAvailable
                                                         ? AppColors.success
                                                         : AppColors.error,
-                                                    behavior: SnackBarBehavior
-                                                        .floating,
                                                   ),
-                                                );
-                                              },
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      const SizedBox(width: 8),
-                                      // Edit Button
-                                      Container(
-                                        decoration: BoxDecoration(
-                                          color:
-                                              AppColors.info.withOpacity(0.15),
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                        ),
-                                        child: IconButton(
-                                          icon: Icon(
-                                            Icons.edit_rounded,
-                                            color: AppColors.info,
-                                            size: 20,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
+                                              ),
+                                              const SizedBox(width: 4),
+                                              Switch(
+                                                value: item.isAvailable,
+                                                activeColor: AppColors.success,
+                                                inactiveTrackColor: AppColors
+                                                    .error
+                                                    .withOpacity(0.3),
+                                                materialTapTargetSize:
+                                                    MaterialTapTargetSize
+                                                        .shrinkWrap,
+                                                onChanged: (val) {
+                                                  menuModel.toggleAvailability(
+                                                    item.id,
+                                                    val,
+                                                  );
+                                                  ScaffoldMessenger.of(
+                                                    context,
+                                                  ).showSnackBar(
+                                                    SnackBar(
+                                                      content: Row(
+                                                        children: [
+                                                          Icon(
+                                                            val
+                                                                ? Icons
+                                                                      .check_circle_rounded
+                                                                : Icons
+                                                                      .cancel_rounded,
+                                                            color: Colors.white,
+                                                          ),
+                                                          const SizedBox(
+                                                            width: 12,
+                                                          ),
+                                                          Expanded(
+                                                            child: Text(
+                                                              "${item.name} is now ${val ? 'Available' : 'Unavailable'}",
+                                                              style: const TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w600,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      backgroundColor: val
+                                                          ? AppColors.success
+                                                          : AppColors.error,
+                                                      behavior: SnackBarBehavior
+                                                          .floating,
+                                                    ),
+                                                  );
+                                                },
+                                              ),
+                                            ],
                                           ),
-                                          onPressed: () => _showItemDialog(
-                                              context, menuModel,
-                                              item: item),
-                                          tooltip: 'Edit',
                                         ),
-                                      ),
-                                    ],
+                                        const SizedBox(width: 8),
+                                        // Edit Button
+                                        Container(
+                                          decoration: BoxDecoration(
+                                            color: AppColors.info.withOpacity(
+                                              0.15,
+                                            ),
+                                            borderRadius: BorderRadius.circular(
+                                              10,
+                                            ),
+                                          ),
+                                          child: IconButton(
+                                            icon: Icon(
+                                              Icons.edit_rounded,
+                                              color: AppColors.info,
+                                              size: 20,
+                                            ),
+                                            onPressed: () => _showItemDialog(
+                                              context,
+                                              menuModel,
+                                              item: item,
+                                            ),
+                                            tooltip: 'Edit',
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
-                          ),
                           ),
                         );
                       },
@@ -1302,11 +1359,7 @@ class AdminMenuView extends StatelessWidget {
     }
     return Container(
       color: AppColors.surfaceLight,
-      child: Icon(
-        Icons.fastfood_rounded,
-        color: AppColors.primary,
-        size: 32,
-      ),
+      child: Icon(Icons.fastfood_rounded, color: AppColors.primary, size: 32),
     );
   }
 
@@ -1374,7 +1427,10 @@ class AdminMenuView extends StatelessWidget {
                   style: TextStyle(color: AppColors.textPrimary),
                   decoration: InputDecoration(
                     labelText: "Item Name",
-                    prefixIcon: Icon(Icons.restaurant_menu_rounded, color: AppColors.primary),
+                    prefixIcon: Icon(
+                      Icons.restaurant_menu_rounded,
+                      color: AppColors.primary,
+                    ),
                     filled: true,
                     fillColor: AppColors.surfaceLight,
                   ),
@@ -1386,7 +1442,10 @@ class AdminMenuView extends StatelessWidget {
                   maxLines: 2,
                   decoration: InputDecoration(
                     labelText: "Description",
-                    prefixIcon: Icon(Icons.description_rounded, color: AppColors.primary),
+                    prefixIcon: Icon(
+                      Icons.description_rounded,
+                      color: AppColors.primary,
+                    ),
                     filled: true,
                     fillColor: AppColors.surfaceLight,
                   ),
@@ -1400,7 +1459,10 @@ class AdminMenuView extends StatelessWidget {
                         style: TextStyle(color: AppColors.textPrimary),
                         decoration: InputDecoration(
                           labelText: "Price (Rs.)",
-                          prefixIcon: Icon(Icons.attach_money_rounded, color: AppColors.success),
+                          prefixIcon: Icon(
+                            Icons.attach_money_rounded,
+                            color: AppColors.success,
+                          ),
                           filled: true,
                           fillColor: AppColors.surfaceLight,
                         ),
@@ -1414,7 +1476,10 @@ class AdminMenuView extends StatelessWidget {
                         style: TextStyle(color: AppColors.textPrimary),
                         decoration: InputDecoration(
                           labelText: "Calories",
-                          prefixIcon: Icon(Icons.local_fire_department_rounded, color: AppColors.warning),
+                          prefixIcon: Icon(
+                            Icons.local_fire_department_rounded,
+                            color: AppColors.warning,
+                          ),
                           filled: true,
                           fillColor: AppColors.surfaceLight,
                         ),
@@ -1429,7 +1494,10 @@ class AdminMenuView extends StatelessWidget {
                   style: TextStyle(color: AppColors.textPrimary),
                   decoration: InputDecoration(
                     labelText: "Rating (0-5)",
-                    prefixIcon: Icon(Icons.star_rounded, color: AppColors.secondary),
+                    prefixIcon: Icon(
+                      Icons.star_rounded,
+                      color: AppColors.secondary,
+                    ),
                     filled: true,
                     fillColor: AppColors.surfaceLight,
                   ),
@@ -1441,7 +1509,10 @@ class AdminMenuView extends StatelessWidget {
                   style: TextStyle(color: AppColors.textPrimary),
                   decoration: InputDecoration(
                     labelText: "Image (local:name.jpg)",
-                    prefixIcon: Icon(Icons.image_rounded, color: AppColors.info),
+                    prefixIcon: Icon(
+                      Icons.image_rounded,
+                      color: AppColors.info,
+                    ),
                     filled: true,
                     fillColor: AppColors.surfaceLight,
                     hintText: "local:burger.jpg",
@@ -1453,7 +1524,10 @@ class AdminMenuView extends StatelessWidget {
                   style: TextStyle(color: AppColors.textPrimary),
                   decoration: InputDecoration(
                     labelText: "Tag (e.g. healthy)",
-                    prefixIcon: Icon(Icons.label_rounded, color: AppColors.accent),
+                    prefixIcon: Icon(
+                      Icons.label_rounded,
+                      color: AppColors.accent,
+                    ),
                     filled: true,
                     fillColor: AppColors.surfaceLight,
                   ),
@@ -1466,7 +1540,9 @@ class AdminMenuView extends StatelessWidget {
                   decoration: InputDecoration(
                     labelText: "Category",
                     prefixIcon: Icon(
-                      category == 'food' ? Icons.restaurant_rounded : Icons.local_cafe_rounded,
+                      category == 'food'
+                          ? Icons.restaurant_rounded
+                          : Icons.local_cafe_rounded,
                       color: AppColors.primary,
                     ),
                     filled: true,
@@ -1478,7 +1554,9 @@ class AdminMenuView extends StatelessWidget {
                       child: Row(
                         children: [
                           Icon(
-                            c == 'food' ? Icons.restaurant_rounded : Icons.local_cafe_rounded,
+                            c == 'food'
+                                ? Icons.restaurant_rounded
+                                : Icons.local_cafe_rounded,
                             size: 18,
                             color: AppColors.primary,
                           ),
@@ -1532,9 +1610,15 @@ class AdminMenuView extends StatelessWidget {
               onPressed: () => Navigator.pop(context),
               style: TextButton.styleFrom(
                 foregroundColor: AppColors.textSecondary,
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 12,
+                ),
               ),
-              child: const Text("Cancel", style: TextStyle(fontWeight: FontWeight.w600)),
+              child: const Text(
+                "Cancel",
+                style: TextStyle(fontWeight: FontWeight.w600),
+              ),
             ),
             Container(
               decoration: BoxDecoration(
@@ -1554,7 +1638,10 @@ class AdminMenuView extends StatelessWidget {
                   foregroundColor: Colors.white,
                   elevation: 0,
                   shadowColor: Colors.transparent,
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 12,
+                  ),
                 ),
                 onPressed: () {
                   final newItem = MenuItemModel(
@@ -1576,12 +1663,17 @@ class AdminMenuView extends StatelessWidget {
                       SnackBar(
                         content: Row(
                           children: [
-                            Icon(Icons.check_circle_rounded, color: Colors.white),
+                            Icon(
+                              Icons.check_circle_rounded,
+                              color: Colors.white,
+                            ),
                             const SizedBox(width: 12),
                             Expanded(
                               child: Text(
                                 "Successfully added '${newItem.name}'",
-                                style: const TextStyle(fontWeight: FontWeight.w600),
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
                             ),
                           ],
@@ -1596,12 +1688,17 @@ class AdminMenuView extends StatelessWidget {
                       SnackBar(
                         content: Row(
                           children: [
-                            Icon(Icons.check_circle_rounded, color: Colors.white),
+                            Icon(
+                              Icons.check_circle_rounded,
+                              color: Colors.white,
+                            ),
                             const SizedBox(width: 12),
                             Expanded(
                               child: Text(
                                 "Successfully updated '${newItem.name}'",
-                                style: const TextStyle(fontWeight: FontWeight.w600),
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
                             ),
                           ],
@@ -1669,8 +1766,8 @@ class AdminUserView extends StatelessWidget {
                 Text(
                   'Loading users...',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: AppColors.textSecondary,
-                      ),
+                    color: AppColors.textSecondary,
+                  ),
                 ),
               ],
             ),
@@ -1678,10 +1775,14 @@ class AdminUserView extends StatelessWidget {
         }
 
         final allUsers = snapshot.data ?? [];
-        
+
         // Separate admins and regular users
-        final admins = allUsers.where((u) => u.role.toLowerCase() == 'admin').toList();
-        final users = allUsers.where((u) => u.role.toLowerCase() != 'admin').toList();
+        final admins = allUsers
+            .where((u) => u.role.toLowerCase() == 'admin')
+            .toList();
+        final users = allUsers
+            .where((u) => u.role.toLowerCase() != 'admin')
+            .toList();
 
         if (allUsers.isEmpty) {
           return Center(
@@ -1704,16 +1805,16 @@ class AdminUserView extends StatelessWidget {
                 Text(
                   "No Users Found",
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        color: AppColors.textPrimary,
-                        fontWeight: FontWeight.w600,
-                      ),
+                    color: AppColors.textPrimary,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   "No registered users in the system",
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: AppColors.textSecondary,
-                      ),
+                    color: AppColors.textSecondary,
+                  ),
                 ),
               ],
             ),
@@ -1727,10 +1828,7 @@ class AdminUserView extends StatelessWidget {
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [
-                    AppColors.surface,
-                    AppColors.background,
-                  ],
+                  colors: [AppColors.surface, AppColors.background],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                 ),
@@ -1747,16 +1845,16 @@ class AdminUserView extends StatelessWidget {
                       Text(
                         'User Management',
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              color: AppColors.textPrimary,
-                              fontWeight: FontWeight.w700,
-                            ),
+                          color: AppColors.textPrimary,
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         '${admins.length} admin(s) • ${users.length} user(s)',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: AppColors.textSecondary,
-                            ),
+                          color: AppColors.textSecondary,
+                        ),
                       ),
                     ],
                   ),
@@ -1779,9 +1877,13 @@ class AdminUserView extends StatelessWidget {
                         foregroundColor: Colors.white,
                         elevation: 0,
                         shadowColor: Colors.transparent,
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
                       ),
-                      onPressed: () => _showCreateAdminDialog(context, authViewModel),
+                      onPressed: () =>
+                          _showCreateAdminDialog(context, authViewModel),
                       icon: const Icon(Icons.person_add_rounded, size: 20),
                       label: const Text(
                         'Add Admin',
@@ -1807,12 +1909,14 @@ class AdminUserView extends StatelessWidget {
                       AppColors.primary,
                     ),
                     const SizedBox(height: 12),
-                    ...admins.map((user) => _buildUserCard(
-                      context,
-                      authViewModel,
-                      user,
-                      currentUserId,
-                    )),
+                    ...admins.map(
+                      (user) => _buildUserCard(
+                        context,
+                        authViewModel,
+                        user,
+                        currentUserId,
+                      ),
+                    ),
                     const SizedBox(height: 24),
                   ],
                   // User Section
@@ -1825,12 +1929,14 @@ class AdminUserView extends StatelessWidget {
                       AppColors.info,
                     ),
                     const SizedBox(height: 12),
-                    ...users.map((user) => _buildUserCard(
-                      context,
-                      authViewModel,
-                      user,
-                      currentUserId,
-                    )),
+                    ...users.map(
+                      (user) => _buildUserCard(
+                        context,
+                        authViewModel,
+                        user,
+                        currentUserId,
+                      ),
+                    ),
                   ],
                 ],
               ),
@@ -1852,18 +1958,12 @@ class AdminUserView extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [
-            color.withOpacity(0.15),
-            color.withOpacity(0.05),
-          ],
+          colors: [color.withOpacity(0.15), color.withOpacity(0.05)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: color.withOpacity(0.3),
-          width: 1,
-        ),
+        border: Border.all(color: color.withOpacity(0.3), width: 1),
       ),
       child: Row(
         children: [
@@ -1872,9 +1972,9 @@ class AdminUserView extends StatelessWidget {
           Text(
             title,
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: AppColors.textPrimary,
-                  fontWeight: FontWeight.w700,
-                ),
+              color: AppColors.textPrimary,
+              fontWeight: FontWeight.w700,
+            ),
           ),
           const SizedBox(width: 8),
           Container(
@@ -1913,7 +2013,9 @@ class AdminUserView extends StatelessWidget {
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isSelf ? AppColors.primary.withOpacity(0.5) : AppColors.divider,
+          color: isSelf
+              ? AppColors.primary.withOpacity(0.5)
+              : AppColors.divider,
           width: isSelf ? 2 : 1,
         ),
         boxShadow: [
@@ -1933,10 +2035,7 @@ class AdminUserView extends StatelessWidget {
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [
-                    AppColors.surfaceLight,
-                    AppColors.surface,
-                  ],
+                  colors: [AppColors.surfaceLight, AppColors.surface],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -1977,9 +2076,7 @@ class AdminUserView extends StatelessWidget {
                             Flexible(
                               child: Text(
                                 user.name ?? 'No Name',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleMedium
+                                style: Theme.of(context).textTheme.titleMedium
                                     ?.copyWith(
                                       color: AppColors.textPrimary,
                                       fontWeight: FontWeight.w700,
@@ -2021,12 +2118,8 @@ class AdminUserView extends StatelessWidget {
                             Expanded(
                               child: Text(
                                 user.email,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodySmall
-                                    ?.copyWith(
-                                      color: AppColors.textSecondary,
-                                    ),
+                                style: Theme.of(context).textTheme.bodySmall
+                                    ?.copyWith(color: AppColors.textSecondary),
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ),
@@ -2052,11 +2145,7 @@ class AdminUserView extends StatelessWidget {
                     ),
                     child: Row(
                       children: [
-                        Icon(
-                          roleIcon,
-                          size: 16,
-                          color: roleColor,
-                        ),
+                        Icon(roleIcon, size: 16, color: roleColor),
                         const SizedBox(width: 6),
                         Text(
                           user.role.toUpperCase(),
@@ -2125,7 +2214,8 @@ class AdminUserView extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (_) => OrderHistoryScreen(userId: user.uid),
+                              builder: (_) =>
+                                  OrderHistoryScreen(userId: user.uid),
                             ),
                           );
                         },
@@ -2145,17 +2235,21 @@ class AdminUserView extends StatelessWidget {
                     child: IconButton(
                       icon: Icon(
                         Icons.person_remove_rounded,
-                        color: isSelf ? AppColors.textTertiary : AppColors.error,
+                        color: isSelf
+                            ? AppColors.textTertiary
+                            : AppColors.error,
                         size: 20,
                       ),
                       onPressed: isSelf
                           ? null // Disable for self
                           : () => _confirmDeleteUser(
-                                context,
-                                authViewModel,
-                                user,
-                              ),
-                      tooltip: isSelf ? 'Cannot delete yourself' : 'Remove User',
+                              context,
+                              authViewModel,
+                              user,
+                            ),
+                      tooltip: isSelf
+                          ? 'Cannot delete yourself'
+                          : 'Remove User',
                     ),
                   ),
                 ],
@@ -2206,10 +2300,7 @@ class AdminUserView extends StatelessWidget {
         ),
         content: Text(
           "Are you sure you want to remove ${user.name}? This user will lose access to the system.",
-          style: TextStyle(
-            color: AppColors.textSecondary,
-            fontSize: 14,
-          ),
+          style: TextStyle(color: AppColors.textSecondary, fontSize: 14),
         ),
         actions: [
           TextButton(
@@ -2218,7 +2309,10 @@ class AdminUserView extends StatelessWidget {
               foregroundColor: AppColors.textSecondary,
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             ),
-            child: const Text("Cancel", style: TextStyle(fontWeight: FontWeight.w600)),
+            child: const Text(
+              "Cancel",
+              style: TextStyle(fontWeight: FontWeight.w600),
+            ),
           ),
           Container(
             decoration: BoxDecoration(
@@ -2240,7 +2334,10 @@ class AdminUserView extends StatelessWidget {
                 foregroundColor: Colors.white,
                 elevation: 0,
                 shadowColor: Colors.transparent,
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 12,
+                ),
               ),
               onPressed: () async {
                 bool success = await auth.deleteUser(user.uid);
@@ -2251,7 +2348,9 @@ class AdminUserView extends StatelessWidget {
                       content: Row(
                         children: [
                           Icon(
-                            success ? Icons.check_circle_rounded : Icons.error_rounded,
+                            success
+                                ? Icons.check_circle_rounded
+                                : Icons.error_rounded,
                             color: Colors.white,
                           ),
                           const SizedBox(width: 12),
@@ -2259,19 +2358,27 @@ class AdminUserView extends StatelessWidget {
                             child: Text(
                               success
                                   ? "User '${user.name}' has been removed"
-                                  : auth.errorMessage ?? "Failed to remove user",
-                              style: const TextStyle(fontWeight: FontWeight.w600),
+                                  : auth.errorMessage ??
+                                        "Failed to remove user",
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
                         ],
                       ),
-                      backgroundColor: success ? AppColors.success : AppColors.error,
+                      backgroundColor: success
+                          ? AppColors.success
+                          : AppColors.error,
                       behavior: SnackBarBehavior.floating,
                     ),
                   );
                 }
               },
-              child: const Text("Remove", style: TextStyle(fontWeight: FontWeight.w600)),
+              child: const Text(
+                "Remove",
+                style: TextStyle(fontWeight: FontWeight.w600),
+              ),
             ),
           ),
         ],
@@ -2389,7 +2496,10 @@ class AdminUserView extends StatelessWidget {
               foregroundColor: AppColors.textSecondary,
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             ),
-            child: const Text("Cancel", style: TextStyle(fontWeight: FontWeight.w600)),
+            child: const Text(
+              "Cancel",
+              style: TextStyle(fontWeight: FontWeight.w600),
+            ),
           ),
           Container(
             decoration: BoxDecoration(
@@ -2409,7 +2519,10 @@ class AdminUserView extends StatelessWidget {
                 foregroundColor: Colors.white,
                 elevation: 0,
                 shadowColor: Colors.transparent,
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 12,
+                ),
               ),
               onPressed: () async {
                 if (nameController.text.isEmpty ||
@@ -2434,19 +2547,24 @@ class AdminUserView extends StatelessWidget {
 
                 if (context.mounted) {
                   Navigator.pop(context);
-                  
+
                   if (success) {
                     // Show success message before navigating to login
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Row(
                           children: [
-                            Icon(Icons.check_circle_rounded, color: Colors.white),
+                            Icon(
+                              Icons.check_circle_rounded,
+                              color: Colors.white,
+                            ),
                             const SizedBox(width: 12),
                             Expanded(
                               child: Text(
                                 "Admin account created successfully! Please log in again.",
-                                style: const TextStyle(fontWeight: FontWeight.w600),
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
                             ),
                           ],
@@ -2456,7 +2574,7 @@ class AdminUserView extends StatelessWidget {
                         duration: const Duration(seconds: 3),
                       ),
                     );
-                    
+
                     // Navigate to login (admin was logged out by Firebase)
                     await Future.delayed(const Duration(milliseconds: 500));
                     Navigator.pushReplacementNamed(context, '/login');
@@ -2471,7 +2589,9 @@ class AdminUserView extends StatelessWidget {
                             Expanded(
                               child: Text(
                                 auth.errorMessage ?? "Failed to create admin",
-                                style: const TextStyle(fontWeight: FontWeight.w600),
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
                             ),
                           ],
@@ -2483,7 +2603,10 @@ class AdminUserView extends StatelessWidget {
                   }
                 }
               },
-              child: const Text("Create Admin", style: TextStyle(fontWeight: FontWeight.w600)),
+              child: const Text(
+                "Create Admin",
+                style: TextStyle(fontWeight: FontWeight.w600),
+              ),
             ),
           ),
         ],

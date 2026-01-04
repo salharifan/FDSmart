@@ -75,7 +75,7 @@ class OrderViewModel extends ChangeNotifier {
   Stream<List<OrderModel>> getAllActiveOrdersStream() {
     return _firestore
         .collection('orders')
-        // .where('status', whereIn: ['preparing', 'ready']) // Optional filter
+        // .where('status', whereIn: ['preparing']) // Optional filter
         .snapshots()
         .map((snapshot) {
           return snapshot.docs.map((doc) {
